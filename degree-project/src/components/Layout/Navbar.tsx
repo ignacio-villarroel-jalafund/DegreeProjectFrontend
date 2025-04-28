@@ -27,9 +27,6 @@ const Navbar: React.FC = () => {
               <span className={styles.userInfo}>Hola, {user?.email}</span>
             </li>
             <li>
-              {/* <Link to="/profile">Perfil</Link> */}
-            </li>
-            <li>
               <button onClick={handleLogout} className={styles.logoutButton}>
                 Cerrar Sesión
               </button>
