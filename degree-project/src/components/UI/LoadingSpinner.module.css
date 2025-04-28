@@ -6,7 +6,7 @@
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 3rem auto;
-}
+  }
   
   @keyframes spin {
     to {
