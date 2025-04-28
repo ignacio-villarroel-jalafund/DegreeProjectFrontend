@@ -1,0 +1,114 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #FF0000;
+  color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.brand a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.searchContainer {
+  flex-grow: 1;
+  max-width: 500px;
+  min-width: 200px;
+  display: flex;
+  justify-content: center;
+}
+
+.searchContainer > form {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.searchContainer input[type="search"] {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #333;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.searchContainer input[type="search"]::placeholder {
+  color: #555;
+}
+
+.searchContainer button {
+  background-color: white;
+  color: #CC0000;
+  border: none;
+}
+
+.searchContainer button:hover:not(:disabled) {
+  background-color: #eee;
+}
+
+.userSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.userInfo {
+  font-weight: 500;
+}
+
+.authLink, .authButton {
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: 1px solid white;
+  border-radius: 4px;
+  background-color: transparent;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  font-size: 0.9rem;
+}
+
+.authLink:hover, .authButton:hover {
+  background-color: white;
+  color: #FF0000;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    padding: 1rem;
+  }
+  .searchContainer {
+    order: 3;
+    width: 100%;
+    max-width: none;
+    margin-top: 0.5rem;
+  }
+  .userSection {
+    order: 2;
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+  .brand {
+    order: 1;
+    align-self: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .authLink, .authButton {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+  .searchContainer input[type="search"], .searchContainer button {
+    font-size: 0.9rem;
+  }
+}
