@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useMemo, useCallback, useContext } from 'react';
-import { apiClient, type User } from '../services/api';
+import { apiClient, User } from '../services/api';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -12,12 +12,14 @@ interface AuthContextType {
   fetchUser: () => Promise<void>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuthHook = () => {
+// eslint-disable-next-line react-refresh/only-export-components
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuthHook must be used within an AuthProvider');
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
@@ -92,16 +94,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         fetchUser();
      } else if (!token) {
          setIsLoading(false);
-         setUser(null);
      }
-  }, [token, isLoading, fetchUser]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, fetchUser]);
 
   const login = useCallback(async (newToken: string) => {
     console.log('Login successful, setting token.');
     localStorage.setItem('authToken', newToken);
     setToken(newToken);
     setIsLoading(true);
-  }, []);
+    await fetchUser();
+  }, [fetchUser]);
 
   const logout = useCallback(() => {
     console.log('Logging out.');
@@ -122,7 +125,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     fetchUser
   }), [isAuthenticated, user, token, isLoading, isOnline, login, logout, fetchUser]);
-
+  
   return (
     <AuthContext.Provider value={value}>
       {children}
