@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import type { FormEvent } from 'react';
+import React, { useState, FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { apiClient, type AuthToken } from '../services/api';
+import { apiClient, AuthToken } from '../services/api';
 import styles from './FormPage.module.css';
 
 const LoginPage: React.FC = () => {
