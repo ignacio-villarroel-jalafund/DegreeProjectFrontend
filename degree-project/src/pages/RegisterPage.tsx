@@ -1,6 +1,6 @@
-import React, { useState, type FormEvent } from 'react';
+import React, { useState, FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { apiClient, type User } from '../services/api';
+import { apiClient, User } from '../services/api';
 import styles from './FormPage.module.css';
 import { useAuth } from '../hooks/useAuth';
 
@@ -13,21 +13,6 @@ const RegisterPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { isOnline } = useAuth();
   const navigate = useNavigate();
-
-  const registerBackgroundSync = async () => {
-      try {
-          const registration = await navigator.serviceWorker.ready;
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (registration as any).sync.register('sync-registrations');
-          console.log('Background sync registered for registration');
-          setInfo('Estás offline. Tu registro se completará cuando vuelvas a tener conexión.');
-          setError(null);
-      } catch (err) {
-          console.error('Background sync registration failed:', err);
-          setError('No se pudo registrar la tarea de sincronización. Inténtalo cuando tengas conexión.');
-          setInfo(null);
-      }
-  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -54,12 +39,12 @@ const RegisterPage: React.FC = () => {
       console.log('Registration successful online.');
       alert('¡Registro exitoso! Ahora puedes iniciar sesión.');
       navigate('/login');
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error('Registration failed:', err);
       if (!isOnline || (err.message && err.message.toLowerCase().includes('network error'))) {
           console.log('Registration failed due to offline status. Attempting background sync.');
-          await registerBackgroundSync();
 
       } else if (err.response && err.response.data && err.response.data.detail) {
          if (err.response.status === 400 && typeof err.response.data.detail === 'string' && err.response.data.detail.includes("registrado")) {
@@ -73,7 +58,7 @@ const RegisterPage: React.FC = () => {
                   validationErrors += 'Verifica los datos ingresados.';
               }
               setError(validationErrors);
-          }
+         }
           else {
              setError(err.response.data.detail || 'Error al registrar el usuario.');
           }
