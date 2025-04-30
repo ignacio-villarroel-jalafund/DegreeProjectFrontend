@@ -1,4 +1,4 @@
-import React, { useState, type FormEvent } from 'react';
+import React, { useState, FormEvent } from 'react';
 import styles from './SearchForm.module.css';
 
 interface SearchFormProps {
@@ -11,8 +11,12 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch, isLoading }) => {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (query.trim()) {
-      onSearch(query.trim());
+    const trimmedQuery = query.trim();
+
+    const isValid = trimmedQuery.length >= 3 && /[a-zA-Z0-9]/.test(trimmedQuery);
+
+    if (isValid) {
+      onSearch(trimmedQuery);
     }
   };
 
@@ -26,7 +30,11 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch, isLoading }) => {
         className={styles.searchInput}
         disabled={isLoading}
       />
-      <button type="submit" className={styles.searchButton} disabled={isLoading}>
+      <button
+        type="submit"
+        className={styles.searchButton}
+        disabled={isLoading}
+      >
         {isLoading ? 'Buscando...' : 'Buscar'}
       </button>
     </form>
