@@ -1,0 +1,288 @@
+.detailPage {
+max-width: 900px;
+margin: 2rem auto;
+padding: 1rem 1.5rem;
+background-color: #fff;
+border-radius: 8px;
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+font-family: sans-serif;
+color: #333;
+}
+
+.backButton {
+background: none;
+border: 1px solid #ccc;
+padding: 0.5rem 1rem;
+border-radius: 4px;
+cursor: pointer;
+margin-bottom: 1.5rem;
+transition: background-color 0.2s ease;
+font-size: 0.9rem;
+display: inline-flex;
+align-items: center;
+gap: 0.5rem;
+background-color: white;
+color: #CC0000;
+font-weight: 500;
+text-decoration: none;
+transition: background-color 0.2s, color 0.2s;
+margin-bottom: 1rem;
+}
+
+.backButton:hover {
+background-color: #eee;
+}
+
+.title {
+text-align: center;
+margin-bottom: 2rem;
+color: #5a4a42;
+font-size: 2.2rem;
+}
+
+.mainContent {
+display: flex;
+flex-direction: column;
+gap: 1.5rem;
+margin-bottom: 2rem;
+}
+
+.imageContainer {
+flex: 1;
+text-align: center;
+}
+
+.recipeImage {
+max-width: 100%;
+height: auto;
+border-radius: 8px;
+object-fit: cover;
+max-height: 400px;
+box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.infoContainer {
+flex: 1;
+background-color: #f9f9f9;
+padding: 1rem;
+border-radius: 5px;
+border: 1px solid #eee;
+}
+
+.timing p, .rating, .infoContainer p {
+margin-bottom: 0.6rem;
+line-height: 1.5;
+font-size: 0.95rem;
+}
+
+.rating {
+font-weight: bold;
+color: #e8a838;
+}
+
+.section {
+margin-bottom: 2rem;
+padding-top: 1rem;
+border-top: 1px solid #eee;
+}
+
+.section:first-of-type {
+border-top: none;
+}
+
+.sectionTitle {
+margin-bottom: 1rem;
+font-size: 1.5rem;
+color: #666;
+border-bottom: 2px solid #e0e0e0;
+padding-bottom: 0.3rem;
+}
+
+.list {
+list-style: none;
+padding-left: 0;
+}
+
+.list li {
+background-color: #fdfdfd;
+border-bottom: 1px dashed #eee;
+padding: 0.8rem 0.5rem;
+line-height: 1.6;
+font-size: 1rem;
+}
+
+.list li:last-child {
+border-bottom: none;
+}
+
+.list ol {
+list-style: decimal inside;
+padding-left: 1rem;
+}
+
+.list ol li {
+padding-left: 0.5rem;
+margin-bottom: 0.8rem;
+}
+
+.nutritionList li {
+display: flex;
+justify-content: space-between;
+padding: 0.5rem;
+background-color: transparent;
+border-bottom: 1px solid #f0f0f0;
+}
+
+.nutritionList li strong {
+margin-right: 0.5rem;
+color: #555;
+}
+
+.directionsText {
+line-height: 1.7;
+white-space: pre-wrap;
+font-size: 1rem;
+}
+
+.link {
+color: #007bff;
+text-decoration: none;
+font-weight: bold;
+}
+
+.link:hover {
+text-decoration: underline;
+}
+
+.error {
+color: #d9534f;
+text-align: center;
+font-size: 1.2rem;
+margin-top: 2rem;
+}
+
+@media (min-width: 768px) {
+.detailPage {
+    padding: 2rem;
+}
+
+.mainContent {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 2rem;
+}
+
+.imageContainer {
+    flex-basis: 45%;
+    max-width: 45%;
+}
+
+.infoContainer {
+    flex-basis: 55%;
+    max-width: 55%;
+}
+
+.title {
+    font-size: 2.5rem;
+}
+
+.sectionTitle {
+    font-size: 1.7rem;
+}
+}
+
+@media (min-width: 1024px) {
+.detailPage {
+    padding: 2rem 3rem;
+}
+
+.title {
+    font-size: 2.8rem;
+}
+}
+
+.displayPage { /* Renombrado de .detailPage si quieres */
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 1rem 1.5rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: sans-serif;
+    color: #333;
+}
+
+/* Estilos para el botón de análisis */
+.analyzeButton {
+    background-color: #28a745; /* Verde */
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    margin-bottom: 1rem; /* Espacio debajo */
+}
+
+.analyzeButton:hover:not(:disabled) {
+    background-color: #218838;
+}
+
+.analyzeButton:disabled {
+    background-color: #94d3a2;
+    cursor: not-allowed;
+}
+
+/* Estilos para el resultado del análisis */
+.analysisResult {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #e9f5ec; /* Fondo verde claro */
+    border: 1px solid #c3e6cb; /* Borde verde */
+    border-radius: 5px;
+    color: #155724; /* Texto verde oscuro */
+}
+
+.analysisResult h3 {
+    margin-top: 0;
+    color: #155724;
+}
+
+/* Estilo para listas ordenadas */
+.orderedList {
+    list-style: decimal inside;
+    padding-left: 1.2em; /* Ajusta para que los números se vean bien */
+}
+.orderedList li {
+   padding-left: 0.5rem;
+   margin-bottom: 0.8rem;
+}
+
+
+.error { /* Asegúrate que el estilo de error existe */
+    color: #d9534f; /* Rojo */
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 0.8rem 1rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.imageContainer {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.recipeImage {
+    max-width: 100%;
+    max-height: 400px; /* O el tamaño que prefieras */
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
