@@ -11,27 +11,37 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --light-gray-bg: #f0f0f0;
+  --card-bg: #ffffff;
+  --text-color-light: #333333;
 }
 
 a {
-  font-weight: 500;
-  color: #646cff;
+  color: #007bff;
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+color: #0056b3;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background-color: var(--light-gray-bg);
+  color: var(--text-color-light);
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1 {
-  font-size: 3.2em;
+  font-size: clamp(1.8rem, 5vw + 1rem, 3.2em);
   line-height: 1.1;
 }
 
@@ -54,22 +64,20 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-}
-
 .recipe-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
   padding: 1rem 0;
+}
+
+@media (max-width: 480px) {
+  body { font-size: 14px; }
+  .content { padding: 1rem; }
+  .formContainer { max-width: 95%; padding: 1.5rem; }
+  .submitButton, .searchButton { padding: 0.6rem 1rem; font-size: 0.9rem; }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+   .recipe-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
 }
