@@ -1,252 +1,346 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
-    scrapeRecipeAPI,
-    analyzeRecipeAPI,
-    getTaskStatusAPI,
-    ScrapedRecipeData,
-    TaskResult
-} from '../services/api';
-import LoadingSpinner from '../components/UI/LoadingSpinner';
-import styles from './RecipeDisplayPage.module.css';
+  scrapeRecipeAPI,
+  adaptRecipeAPI,
+  ScrapedRecipeData,
+  RecipeAdaptationRequest,
+  AnalysisType,
+} from "../services/api";
+import LoadingSpinner from "../components/UI/LoadingSpinner";
+import styles from "./RecipeDisplayPage.module.css";
+
+const substitutionSuggestions: Record<string, string[]> = {
+  leche: ["Leche de almendras", "Leche de avena", "Leche de soja"],
+  "harina de trigo": [
+    "Harina de almendras (sin gluten)",
+    "Harina de garbanzos (sin gluten)",
+  ],
+  harina: ["Harina de maíz", "Harina de arroz"],
+  mantequilla: ["Margarina vegana", "Aceite de coco"],
+  huevo: ["Sustituto de huevo vegano", "Puré de plátano"],
+  azúcar: ["Stevia", "Sirope de arce"],
+};
+
+type EditingIngredientState = { index: number; original: string } | null;
+type ScalingState = { active: boolean; value: number };
 
 const RecipeDisplayPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
-  const recipeUrl = queryParams.get('url');
+  const recipeUrl = queryParams.get("url");
 
-  const [scrapedData, setScrapedData] = useState<ScrapedRecipeData | null>(null);
+  const [scrapedData, setScrapedData] = useState<ScrapedRecipeData | null>(
+    null
+  );
   const [isLoadingScrape, setIsLoadingScrape] = useState(true);
   const [scrapeError, setScrapeError] = useState<string | null>(null);
+  const [isLoadingAdaptation, setIsLoadingAdaptation] = useState(false);
+  const [adaptationError, setAdaptationError] = useState<string | null>(null);
+  const [adaptationCompleted, setAdaptationCompleted] = useState(false);
 
-  const [taskId, setTaskId] = useState<string | null>(null);
-  const [analysisResult, setAnalysisResult] = useState<TaskResult | null>(null);
-  const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(false);
-  const [analysisError, setAnalysisError] = useState<string | null>(null);
-  const [pollingIntervalId, setPollingIntervalId] = useState<ReturnType<typeof setInterval> | null>(null);
+  const [editingIngredient, setEditingIngredient] =
+    useState<EditingIngredientState>(null);
+  const [scalingState, setScalingState] = useState<ScalingState>({
+    active: false,
+    value: 0,
+  });
+  const [, setCustomSubstitution] = useState("");
 
   const scrapeFetched = useRef(false);
 
   useEffect(() => {
     if (!recipeUrl) {
-      setScrapeError('No se proporcionó una URL de receta válida.');
+      setScrapeError("No se proporcionó una URL de receta válida.");
       setIsLoadingScrape(false);
       return;
     }
-
     if (scrapeFetched.current) return;
     scrapeFetched.current = true;
-
     const fetchScrapedData = async () => {
-      console.log(`Scraping URL: ${recipeUrl}`);
       setIsLoadingScrape(true);
       setScrapeError(null);
       try {
         const data = await scrapeRecipeAPI(recipeUrl);
         setScrapedData(data);
-        console.log('Scraping successful:', data);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setScalingState({ active: false, value: data.servings || 1 });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
-        console.error('Error during scraping:', err);
-        let errorMsg = 'Error al obtener los datos de la receta.';
-        if (err.response?.data?.detail) {
-            errorMsg = err.response.data.detail;
-        } else if (err.message) {
-            errorMsg = err.message;
-        }
+        let errorMsg = "Error al obtener los datos de la receta.";
+        if (err.response?.data?.detail) errorMsg = err.response.data.detail;
         setScrapeError(errorMsg);
       } finally {
         setIsLoadingScrape(false);
       }
     };
-
     fetchScrapedData();
-
   }, [recipeUrl]);
 
-  useEffect(() => {
-    return () => {
-      if (pollingIntervalId) {
-        clearInterval(pollingIntervalId);
-        console.log('Polling interval cleared.');
-      }
+  const handleAdaptationRequest = async (
+    type: AnalysisType,
+    details: Record<string, any>
+  ) => {
+    if (!scrapedData) return;
+    setIsLoadingAdaptation(true);
+    setAdaptationError(null);
+    setEditingIngredient(null);
+    setScalingState((prev) => ({ ...prev, active: false }));
+
+    const requestBody: RecipeAdaptationRequest = {
+      recipe_data: scrapedData,
+      adaptation: { type, details },
     };
-  }, [pollingIntervalId]);
 
-  const checkTaskStatus = async (currentTaskId: string) => {
-      console.log(`Checking status for task: ${currentTaskId}`);
-      try {
-          const response = await getTaskStatusAPI(currentTaskId);
-          console.log('Task status response:', response);
-
-          const status = response.status.toUpperCase();
-
-          if (status === 'SUCCESS') {
-              setAnalysisResult(response.result as TaskResult);
-              setIsLoadingAnalysis(false);
-              setAnalysisError(null);
-              if (pollingIntervalId) clearInterval(pollingIntervalId);
-              setPollingIntervalId(null);
-              setTaskId(null);
-              console.log('Analysis task succeeded.');
-          } else if (status === 'FAILURE') {
-              let errorMsg = 'La tarea de análisis falló.';
-              if (response.result?.message) {
-                  errorMsg = response.result.message;
-              } else if (response.result?.exc_message) {
-                  errorMsg = response.result.exc_message;
-              }
-              setAnalysisError(errorMsg);
-              setIsLoadingAnalysis(false);
-              setAnalysisResult(null);
-              if (pollingIntervalId) clearInterval(pollingIntervalId);
-              setPollingIntervalId(null);
-              setTaskId(null);
-              console.error('Analysis task failed.');
-          } else if (status === 'PENDING' || status === 'STARTED' || status === 'RETRY') {
-              console.log(`Task ${currentTaskId} status: ${status}. Continuing poll.`);
-          } else {
-              setAnalysisError(`Estado de tarea inesperado: ${response.status}`);
-              setIsLoadingAnalysis(false);
-              if (pollingIntervalId) clearInterval(pollingIntervalId);
-              setPollingIntervalId(null);
-              setTaskId(null);
-          }
-      } catch (error) {
-          setAnalysisError('Error al consultar el estado del análisis.');
-      }
-  };
-
-
-  const handleAnalyze = async () => {
-    if (!scrapedData) {
-      setAnalysisError('No hay datos de receta para analizar.');
-      return;
-    }
-
-    setIsLoadingAnalysis(true);
-    setAnalysisError(null);
-    setAnalysisResult(null);
-    setTaskId(null);
-    if (pollingIntervalId) {
-        clearInterval(pollingIntervalId);
-        setPollingIntervalId(null);
-    }
-
-
-    console.log('Starting analysis for:', scrapedData.recipe_name);
     try {
-      const response = await analyzeRecipeAPI(scrapedData);
-      const newTaskId = response.task_id;
-      setTaskId(newTaskId);
-      console.log('Analysis task started with ID:', taskId);
-
-      checkTaskStatus(newTaskId);
-      const interval = setInterval(() => checkTaskStatus(newTaskId), 5000);
-      setPollingIntervalId(interval);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const response = await adaptRecipeAPI(requestBody);
+      setScrapedData(response.updated_recipe);
+      setAdaptationCompleted(true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      console.error('Error starting analysis task:', err);
-      let errorMsg = 'Error al iniciar el análisis.';
-      if (err.response?.data?.detail) {
-          errorMsg = err.response.data.detail;
-      }
-      setAnalysisError(errorMsg);
-      setIsLoadingAnalysis(false);
+      console.error("Error during adaptation:", err);
+      let errorMsg = "Error al adaptar la receta.";
+      if (err.response?.data?.detail) errorMsg = err.response.data.detail;
+      setAdaptationError(errorMsg);
+    } finally {
+      setIsLoadingAdaptation(false);
     }
   };
 
-  if (isLoadingScrape) {
-    return <LoadingSpinner />;
-  }
+  const handleAdaptDiet = (diet: "vegana" | "sin gluten" | "sin lactosa") => {
+    handleAdaptationRequest("ADAPT_DIET", { diet });
+  };
 
-  if (scrapeError) {
-    return <p className={styles.error}>Error: {scrapeError}</p>;
-  }
+  const handleConfirmScale = () => {
+    const newServings = scalingState.value;
+    if (newServings > 0) {
+      handleAdaptationRequest("SCALE_PORTIONS", { new_servings: newServings });
+    }
+  };
 
-  if (!scrapedData) {
-    return <p>No se pudieron cargar los datos de la receta.</p>;
-  }
+  const handleSelectSubstitution = (target: string) => {
+    if (editingIngredient && target) {
+      handleAdaptationRequest("SUBSTITUTE_INGREDIENT", {
+        from: editingIngredient.original,
+        to: target,
+      });
+      setCustomSubstitution("");
+    }
+  };
+
+  if (isLoadingScrape) return <LoadingSpinner />;
+  if (scrapeError) return <p className={styles.error}>Error: {scrapeError}</p>;
+  if (!scrapedData) return <p>No se pudieron cargar los datos de la receta.</p>;
 
   const ingredientsList = scrapedData.ingredients || [];
   const directionsList = scrapedData.directions || [];
-  const imageUrl = scrapedData.img_url || '/icons/Burger_192.webp';
+  const imageUrl = scrapedData.image_url || "/icons/Burger_192.webp";
+
+  const canScaleServings =
+    scrapedData &&
+    typeof scrapedData.servings === "number" &&
+    scrapedData.servings > 0;
 
   return (
     <div className={styles.displayPage}>
-       <button onClick={() => navigate(-1)} className={styles.backButton}>
-         ← Volver a Resultados
-      </button>
-
-      <h1 className={styles.title}>{scrapedData.recipe_name || 'Receta Sin Nombre'}</h1>
-
-       {scrapedData.img_url && (
-           <div className={styles.imageContainer}>
-               <img src={imageUrl} alt={scrapedData.recipe_name || ''} className={styles.recipeImage} loading="lazy"/>
-           </div>
-       )}
-
-      <div className={styles.section}>
-        <h2 className={styles.sectionTitle}>Ingredientes</h2>
-        {ingredientsList.length > 0 ? (
-          <ul className={styles.list}>
-            {ingredientsList.map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
-          </ul>
-        ) : (
-          <p>No hay ingredientes especificados.</p>
-        )}
-      </div>
-
-      <div className={styles.section}>
-        <h2 className={styles.sectionTitle}>Instrucciones</h2>
-        {directionsList.length > 0 ? (
-           <ol className={`${styles.list} ${styles.orderedList}`}>
-               {directionsList.map((step, index) => (
-                   <li key={index}>{step}</li>
-               ))}
-           </ol>
-        ) : (
-          <p>No hay instrucciones especificadas.</p>
-        )}
-      </div>
-
-       <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Análisis con IA</h2>
-            <button
-                onClick={handleAnalyze}
-                disabled={isLoadingAnalysis || !!pollingIntervalId}
-                className={styles.analyzeButton}
-            >
-                {isLoadingAnalysis ? 'Analizando...' : 'Analizar con IA'}
-            </button>
-
-            {isLoadingAnalysis && !analysisError && <LoadingSpinner />}
-
-            {analysisError && (
-                <p className={styles.error}>Error en el análisis: {analysisError}</p>
-            )}
-
-            {analysisResult && analysisResult.analysis && (
-                <div className={styles.analysisResult}>
-                    <h3>Resultado del Análisis:</h3>
-                    <p style={{ whiteSpace: 'pre-wrap' }}>{analysisResult.analysis}</p>
-                </div>
-            )}
-             {analysisResult && !analysisResult.analysis && !analysisError && !isLoadingAnalysis && (
-                 <p>Análisis completado, pero no se generó texto.</p>
-             )}
-       </div>
-
-      {scrapedData.url && (
-        <div className={styles.section}>
-           <p>Fuente original: <a href={scrapedData.url} target="_blank" rel="noopener noreferrer" className={styles.link}>Ver receta original</a></p>
+      {isLoadingAdaptation && (
+        <div className={styles.loadingOverlay}>
+          <LoadingSpinner />
+          <p>La IA está cocinando tu petición...</p>
         </div>
       )}
 
+      <button onClick={() => navigate(-1)} className={styles.backButton}>
+        ← Volver
+      </button>
+
+      <h1 className={styles.title}>
+        {scrapedData.title || "Receta Sin Nombre"}
+      </h1>
+      <div className={styles.imageContainer}>
+        <img
+          src={imageUrl}
+          alt={scrapedData.title || ""}
+          className={styles.recipeImage}
+          loading="lazy"
+        />
+      </div>
+
+      <div className={styles.section}>
+        <h2 className={styles.sectionTitle}>Modificar Receta con IA</h2>
+        {adaptationError && <p className={styles.error}>{adaptationError}</p>}
+
+        <div className={styles.toolsGroup}>
+          <h3 className={styles.toolsGroupTitle}>Adaptar a una Dieta</h3>
+          <div className={styles.toolsGrid}>
+            <button
+              onClick={() => handleAdaptDiet("vegana")}
+              disabled={isLoadingAdaptation}
+              className={styles.toolButton}
+            >
+              Hacer Vegana
+            </button>
+            <button
+              onClick={() => handleAdaptDiet("sin gluten")}
+              disabled={isLoadingAdaptation}
+              className={styles.toolButton}
+            >
+              Sin Gluten
+            </button>
+            <button
+              onClick={() => handleAdaptDiet("sin lactosa")}
+              disabled={isLoadingAdaptation}
+              className={styles.toolButton}
+            >
+              Sin Lactosa
+            </button>
+          </div>
+        </div>
+
+        {canScaleServings && (
+          <div className={styles.toolsGroup}>
+            <h3 className={styles.toolsGroupTitle}>Ajustar Cantidades</h3>
+            {scalingState.active ? (
+              <div className={styles.scalingForm}>
+                <input
+                  type="number"
+                  value={scalingState.value}
+                  onChange={(e) =>
+                    setScalingState({
+                      ...scalingState,
+                      value: Number(e.target.value),
+                    })
+                  }
+                  className={styles.formInput}
+                  placeholder="Nº de porciones"
+                />
+                <button
+                  onClick={handleConfirmScale}
+                  disabled={isLoadingAdaptation}
+                  className={styles.confirmButton}
+                >
+                  Ajustar
+                </button>
+                <button
+                  onClick={() =>
+                    setScalingState({ ...scalingState, active: false })
+                  }
+                  className={styles.cancelButton}
+                >
+                  Cancelar
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() =>
+                  setScalingState({ ...scalingState, active: true })
+                }
+                disabled={isLoadingAdaptation}
+                className={styles.toolButton}
+              >
+                Escalar Porciones ({scrapedData.servings})
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className={styles.section}>
+        <h2 className={styles.sectionTitle}>
+          Ingredientes
+          {adaptationCompleted && (
+            <span className={styles.aiBadge}>Adaptado por IA</span>
+          )}
+        </h2>
+        <p className={styles.subtleText}>
+          Toca un ingrediente para ver opciones de sustitución.
+        </p>
+        <ul className={styles.list}>
+          {ingredientsList.map((item, index) => (
+            <li
+              key={index}
+              className={styles.interactiveItem}
+              onClick={() =>
+                !isLoadingAdaptation &&
+                setEditingIngredient({ index, original: item })
+              }
+            >
+              {editingIngredient?.index === index ? (
+                <div className={styles.ingredientEditView}>
+                  <h4>Sustituir "{item}"</h4>
+                  <div className={styles.substitutionSuggestions}>
+                    {Object.keys(substitutionSuggestions).find((key) =>
+                      item.toLowerCase().includes(key)
+                    ) ? (
+                      substitutionSuggestions[
+                        Object.keys(substitutionSuggestions).find((key) =>
+                          item.toLowerCase().includes(key)
+                        )!
+                      ].map((sug) => (
+                        <button
+                          key={sug}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelectSubstitution(sug);
+                          }}
+                          className={styles.suggestionButton}
+                        >
+                          {sug}
+                        </button>
+                      ))
+                    ) : (
+                      <p className={styles.noSuggestions}>
+                        No hay sugerencias automáticas.
+                      </p>
+                    )}
+                  </div>
+                  <div className={styles.customSubstitutionForm}></div>
+                </div>
+              ) : (
+                <>
+                  <span>{item}</span>
+                  <button
+                    className={styles.substituteButton}
+                    title="Sustituir con IA"
+                  >
+                    ⇆
+                  </button>
+                </>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className={styles.section}>
+        <h2 className={styles.sectionTitle}>
+          Instrucciones
+          {adaptationCompleted && (
+            <span className={styles.aiBadge}>Adaptado por IA</span>
+          )}
+        </h2>
+        <ol className={`${styles.list} ${styles.orderedList}`}>
+          {directionsList.map((step, index) => (
+            <li key={index}>{step}</li>
+          ))}
+        </ol>
+      </div>
+
+      {scrapedData.url && (
+        <div className={styles.section}>
+          <p>
+            Fuente:{" "}
+            <a
+              href={scrapedData.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.link}
+            >
+              Ver receta original
+            </a>
+          </p>
+        </div>
+      )}
     </div>
   );
 };
