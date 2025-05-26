@@ -7,6 +7,7 @@ import RegisterPage from '../pages/RegisterPage';
 import RecipeDisplayPage from '../pages/RecipeDisplayPage';
 import { useAuth } from '../hooks/useAuth';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
+import SearchResultsPage from '../pages/SearchResultsPage';
 
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { isAuthenticated, isLoading } = useAuth();
@@ -22,6 +23,7 @@ const AppRoutes: React.FC = () => {
       <Route element={<Layout />}>
 
         <Route path="/" element={<HomePage />} />
+        <Route path="/search" element={<SearchResultsPage />} />
         <Route path="/recipe/details" element={<RecipeDisplayPage />} />
 
         <Route
