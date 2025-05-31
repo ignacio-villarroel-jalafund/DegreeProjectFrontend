@@ -113,22 +113,90 @@ background-color: #eee;
 }
 
 .interactiveItem {
+    cursor: pointer;
+    position: relative; /* Asegurar que el menú se posicione relativo al ítem */
+    /* ... otros estilos del interactiveItem ... */
+}
+
+.ingredientEditView { /* Si decides eliminarlo, puedes quitar este estilo también */
+  width: 100%;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+/* Estilos para el nuevo menú contextual */
+.ingredientContextMenu {
+  position: absolute; /* Posicionamiento absoluto respecto al <li> */
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 0.5rem;
+  z-index: 100; /* Asegurar que esté por encima de otros elementos */
+  min-width: 200px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 0.5rem;
+  flex-direction: column;
+}
+
+.menuTitle {
+  padding: 0.5rem 0.75rem;
+  font-weight: 600;
+  color: var(--text-color);
   border-bottom: 1px solid var(--border-color);
+  margin-bottom: 0.5rem;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.menuButton {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 0.75rem 0.75rem;
+  width: 100%;
+  cursor: pointer;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  color: var(--text-color);
   transition: background-color 0.2s ease;
-  position: relative;
-  overflow: hidden;
 }
 
-.interactiveItem:hover {
-  background-color: #fafafa;
+.menuButton:hover {
+  background-color: #f1f3f5; /* Un color de fondo suave al pasar el mouse */
 }
 
-.interactiveItem span {
-  flex-grow: 1;
+.menuButtonCancel {
+  margin-top: 0.5rem;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.menuButtonCancel:hover {
+  background-color: #ffebee; /* Un color de fondo más rojizo para el cancelar */
+}
+
+.substituteButton { /* Ajusta el botón si lo mantienes */
+  background-color: transparent;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 50px;
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem; /* Puedes usar un ícono de tres puntos aquí '⋮' o '...' */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 1rem;
+  opacity: 0.6; /* Hacerlo visible pero sutil */
+  transform: none; /* Quitar la animación de aparición si es siempre visible */
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.interactiveItem:hover .substituteButton {
+  opacity: 1;
+  background-color: #e9ecef;
 }
 
 .substituteButton {
@@ -370,6 +438,93 @@ background-color: #eee;
   margin-bottom: 1rem;
   font-weight: 600;
 }
+
+.ingredientPreviewModalOverlay {
+  position: fixed; /* Cubre toda la pantalla */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* Fondo semitransparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Muy alto para estar por encima de todo */
+  padding: 20px;
+}
+
+.ingredientPreviewModal {
+  background-color: white;
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  max-width: 400px; /* Ancho máximo del modal */
+  width: 90%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ingredientPreviewModal h3 {
+  margin-top: 0;
+  color: var(--text-color);
+  font-size: 1.5rem;
+}
+
+.ingredientPreviewImage {
+  max-width: 100%;
+  max-height: 250px; /* Altura máxima para la imagen */
+  object-fit: contain; /* Para que la imagen no se distorsione */
+  border-radius: 8px;
+  margin: 0 auto; /* Centrar imagen si es más pequeña que el contenedor */
+  border: 1px solid var(--border-color);
+}
+
+.noImagePreview {
+  font-style: italic;
+  color: #6c757d;
+  padding: 2rem 0;
+}
+
+.previewLinkButton, .previewCloseButton {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none; /* Para el enlace */
+  display: inline-block; /* Para el enlace */
+  transition: background-color 0.2s ease;
+}
+
+.previewLinkButton:hover, .previewCloseButton:hover {
+  background-color: var(--primary-hover);
+}
+
+.previewCloseButton {
+  background-color: #6c757d; /* Un color diferente para el botón de cerrar */
+}
+.previewCloseButton:hover {
+  background-color: #5a6268;
+}
+
+/* Ajuste para el posicionamiento del menú contextual si es necesario */
+.ingredientContextMenu {
+  /* ... tus estilos existentes ... */
+  min-width: 220px; /* Un poco más de ancho para los textos */
+}
+
+.menuButton {
+ /* ... tus estilos existentes ... */
+  white-space: nowrap; /* Evita que el texto del botón se rompa en varias líneas */
+  overflow: hidden;
+  text-overflow: ellipsis; /* Añade puntos suspensivos si el texto es muy largo */
+}
+
 
 .substitutionSuggestions {
   display: flex;
