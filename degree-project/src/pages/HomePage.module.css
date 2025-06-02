@@ -49,10 +49,12 @@
 
 .pageTitle {
   text-align: center;
-  font-size: 2.2rem;
+  font-size: clamp(1.6rem, calc(1.3rem + 2vw), 2.5rem);
   font-weight: 700;
   color: #343a40;
-  margin-bottom: 2rem;
+  margin-top: 0;
+  margin-bottom: 2.5rem;
+  line-height: 1.3;
 }
 
 .searchResultsList {
@@ -119,4 +121,288 @@
 
 .errorText {
   color: #c0392b;
+}
+
+@media (max-width: 480px) {
+  .homePageContainer {
+    padding: 1rem;
+  }
+
+  .suggestionButtons {
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .suggestionButton {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .pageTitle {
+    margin-bottom: 2rem;
+  }
+
+  .searchResultsList {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .itemContent h3 {
+    font-size: 1.1rem;
+  }
+}
+
+.locationCorrectionTrigger {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  color: #FF0000;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0 0 0 0.5rem;
+}
+
+.linkButton:hover {
+  color: #cc0000;
+}
+
+.locationCorrectionUI {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.locationCorrectionUI h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.selectContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.subdivisionSelect {
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  min-width: 250px;
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+}
+
+.confirmButton, .cancelButton {
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.confirmButton {
+  background-color: #FF0000;
+  color: white;
+  border: 1px solid #FF0000;
+}
+
+.confirmButton:hover:not(:disabled) {
+  background-color: #D60000;
+}
+
+.confirmButton:disabled {
+  background-color: #fcc;
+  border-color: #fcc;
+  cursor: not-allowed;
+}
+
+.cancelButton {
+  background-color: #6c757d;
+  color: white;
+  border: 1px solid #6c757d;
+  margin-top: 0.5rem;
+}
+
+.cancelButton:hover {
+  background-color: #5a6268;
+}
+
+.errorTextSmall {
+  font-size: 0.9rem;
+  color: #c0392b;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 500px) {
+  .selectContainer {
+    flex-direction: row;
+    justify-content: center;
+  }
+  .subdivisionSelect {
+    width: auto;
+  }
+  .cancelButton {
+    margin-top: 0;
+  }
+}
+
+.locationInfoArea {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  color: #555;
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.locationText {
+  margin-bottom: 0.5rem;
+}
+
+.locationText span {
+  font-weight: 500;
+}
+
+.detectedLocationInfo {
+  font-size: 0.85rem;
+  color: #777;
+}
+
+.detectedLocationInfo span {
+  margin-right: 0.5rem;
+}
+
+.resetButton {
+  margin-left: 0.5rem;
+  font-weight: 500;
+  color: #007bff;
+}
+
+.resetButton:hover {
+  color: #0056b3;
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  color: #FF0000;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0 0 0 0.5rem;
+}
+
+.linkButton:hover {
+  color: #cc0000;
+}
+
+.locationCorrectionUI {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.locationCorrectionUI h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.selectContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.subdivisionSelect {
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  min-width: 250px;
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+}
+
+.confirmButton, .cancelButton.correctionCancelButton {
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.confirmButton {
+  background-color: #FF0000;
+  color: white;
+  border: 1px solid #FF0000;
+}
+
+.confirmButton:hover:not(:disabled) {
+  background-color: #D60000;
+}
+
+.confirmButton:disabled {
+  background-color: #fcc;
+  border-color: #fcc;
+  color: #D60000;
+  cursor: not-allowed;
+}
+
+.cancelButton.correctionCancelButton {
+  background-color: #6c757d;
+  color: white;
+  border: 1px solid #6c757d;
+}
+
+.cancelButton.correctionCancelButton:hover {
+  background-color: #5a6268;
+}
+
+.errorTextSmall {
+  font-size: 0.9rem;
+  color: #c0392b;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 500px) {
+  .selectContainer {
+    flex-direction: row;
+    justify-content: center;
+  }
+  .subdivisionSelect {
+    width: auto;
+  }
 }
