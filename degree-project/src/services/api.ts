@@ -131,6 +131,43 @@ export const getSubdivisionsAPI = async (country: string, lang: string = 'es'): 
   return response.data;
 };
 
+export interface SupermarketInfo {
+  place_id: string;
+  name: string;
+  address: string;
+  rating?: number | null;
+  user_ratings_total?: number | null;
+  website?: string | null;
+  phone_number?: string | null;
+  opening_hours_periods?: string[] | null;
+  icon_url?: string | null;
+  Maps_url?: string | null;
+}
+
+export interface SupermarketSearchResponse {
+  query_location: string;
+  supermarkets: SupermarketInfo[];
+  next_page_token?: string | null;
+  message?: string | null;
+}
+
+export const findSupermarketsAPI = async (
+  city: string,
+  country: string,
+  lang: string = 'es',
+  page_token?: string | null,
+  limit_details: number = 10
+): Promise<SupermarketSearchResponse> => {
+  const params: any = { ciudad: city, pais: country, lang, limit_details };
+  if (page_token) {
+    params.page_token = page_token;
+  }
+  const response = await apiClient.get<SupermarketSearchResponse>('/supermarkets/supermarkets', {
+    params
+  });
+  return response.data;
+};
+
 export interface User {
   id: string;
   email: string;
