@@ -9,11 +9,18 @@ interface RecipeCardProps {
 
 const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
   return (
-    <Link to={`/recipes/${recipe.id}`} className={styles.cardLink}>
+    <Link to={`/recipes/${recipe.url}`} className={styles.cardLink}>
       <div className={styles.recipeCard}>
-        <img src={recipe.img_url} alt={recipe.recipe_name} className={styles.recipeImage} loading="lazy" />
+        <div className={styles.imageContainer}>
+          <img 
+            src={recipe.image_url}
+            alt={recipe.title} 
+            className={styles.recipeImage} 
+            loading="lazy" 
+          />
+        </div>
         <div className={styles.recipeContent}>
-          <h3 className={styles.recipeTitle}>{recipe.recipe_name}</h3>
+          <h3 className={styles.recipeTitle}>{recipe.title}</h3>
         </div>
       </div>
     </Link>

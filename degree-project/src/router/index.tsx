@@ -7,6 +7,10 @@ import RegisterPage from '../pages/RegisterPage';
 import RecipeDisplayPage from '../pages/RecipeDisplayPage';
 import { useAuth } from '../hooks/useAuth';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
+import SearchResultsPage from '../pages/SearchResultsPage';
+
+import ProfilePage from '../pages/ProfilePage';
+import ProtectedRoute from './ProtectedRoute';
 
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { isAuthenticated, isLoading } = useAuth();
@@ -22,7 +26,8 @@ const AppRoutes: React.FC = () => {
       <Route element={<Layout />}>
 
         <Route path="/" element={<HomePage />} />
-        <Route path="/recipe/details" element={<RecipeDisplayPage />} />
+        <Route path="/search" element={<SearchResultsPage />} />
+        <Route path="/recipe/details" element={<RecipeDisplayPage />} /> 
 
         <Route
             path="/login"
@@ -33,7 +38,16 @@ const AppRoutes: React.FC = () => {
             element={ <PublicRoute> <RegisterPage /> </PublicRoute> }
         />
 
-        <Route path="*" element={<div style={{ textAlign: 'center', padding: '2rem' }}><h2>404 - Página no encontrada</h2><p>La ruta que buscas no existe.</p></div>} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/profile" element={<ProfilePage />} />
+        </Route>
+
+        <Route path="*" element={
+          <div style={{ textAlign: 'center', padding: '2rem' }}>
+            <h2>404 - Página no encontrada</h2>
+            <p>La ruta que buscas no existe.</p>
+          </div>
+        }/>
 
       </Route>
     </Routes>

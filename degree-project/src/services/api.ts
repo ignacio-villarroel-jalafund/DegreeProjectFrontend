@@ -29,13 +29,13 @@ export interface RecipeSearchResult {
 }
 
 export interface ScrapedRecipeData {
-  recipe_name?: string | null;
+  title?: string | null;
+  servings?: number | null;
   ingredients?: string[] | null;
   directions?: string[] | null;
   url: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   timing?: any | null;
-  img_url?: string | null;
+  image_url?: string | null;
 }
 
 export interface AnalyzeTaskResponse {
@@ -55,12 +55,27 @@ export interface TaskResult {
 export interface TaskStatusResponse {
   task_id: string;
   status: 'PENDING' | 'STARTED' | 'SUCCESS' | 'FAILURE' | 'RETRY' | string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   result?: TaskResult | any | null;
 }
 
+export type AnalysisType = 'SUBSTITUTE_INGREDIENT' | 'ADAPT_DIET' | 'SCALE_PORTIONS';
+
+export interface AdaptationRequest {
+  type: AnalysisType;
+  details: Record<string, any>;
+}
+
+export interface RecipeAdaptationRequest {
+  recipe_data: ScrapedRecipeData;
+  adaptation: AdaptationRequest;
+}
+
+export interface RecipeAdaptationResponse {
+  summary: string;
+  updated_recipe: ScrapedRecipeData;
+}
+
 export const searchRecipesAPI = async (query: string): Promise<RecipeSearchResult[]> => {
-    console.log(`[api.ts] Calling searchRecipesAPI with query: ${query}`);
     const response = await apiClient.get<RecipeSearchResult[]>('/recipes/search', {
         params: { query }
     });
@@ -84,6 +99,74 @@ export const getTaskStatusAPI = async (taskId: string): Promise<TaskStatusRespon
     return response.data;
 };
 
+export const adaptRecipeAPI = async (request: RecipeAdaptationRequest): Promise<RecipeAdaptationResponse> => {
+  const response = await apiClient.post<RecipeAdaptationResponse>('/recipes/adapt', request);
+  return response.data;
+};
+
+export interface IngredientInfoResponse {
+  name: string | null;
+  image_url: string | null;
+  search_url: string | null;
+}
+
+export const getIngredientInfoAPI = async (textQuery: string): Promise<IngredientInfoResponse> => {
+  const response = await apiClient.get<IngredientInfoResponse>('/recipes/ingredient-info', {
+    params: { text_query: textQuery }
+  });
+
+  return response.data;
+};
+
+export interface SubdivisionData {
+  country_queried: string;
+  subdivisions: string[];
+  message?: string;
+}
+
+export const getSubdivisionsAPI = async (country: string, lang: string = 'es'): Promise<SubdivisionData> => {
+  const response = await apiClient.get<SubdivisionData>('/locations/subdivisions', {
+    params: { country, lang }
+  });
+  return response.data;
+};
+
+export interface SupermarketInfo {
+  place_id: string;
+  name: string;
+  address: string;
+  rating?: number | null;
+  user_ratings_total?: number | null;
+  website?: string | null;
+  phone_number?: string | null;
+  opening_hours_periods?: string[] | null;
+  icon_url?: string | null;
+  Maps_url?: string | null;
+}
+
+export interface SupermarketSearchResponse {
+  query_location: string;
+  supermarkets: SupermarketInfo[];
+  next_page_token?: string | null;
+  message?: string | null;
+}
+
+export const findSupermarketsAPI = async (
+  city: string,
+  country: string,
+  lang: string = 'es',
+  page_token?: string | null,
+  limit_details: number = 10
+): Promise<SupermarketSearchResponse> => {
+  const params: any = { ciudad: city, pais: country, lang, limit_details };
+  if (page_token) {
+    params.page_token = page_token;
+  }
+  const response = await apiClient.get<SupermarketSearchResponse>('/supermarkets/supermarkets', {
+    params
+  });
+  return response.data;
+};
 
 export interface User {
   id: string;
@@ -99,8 +182,7 @@ export interface AuthToken {
 }
 
 export interface Recipe {
-    id: string;
-    recipe_name: string;
+    title: string;
     prep_time?: number | null;
     cook_time?: number | null;
     total_time?: number | null;
@@ -113,7 +195,7 @@ export interface Recipe {
     cuisine_path?: string | null;
     nutrition?: string | null;
     timing?: string | null;
-    img_url: string;
+    image_url: string;
     created_at?: string;
     updated_at?: string | null;
 }
