@@ -8,8 +8,8 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   position: sticky;
   top: 0;
-  z-index: 1000;
-  flex-wrap: wrap;
+  z-index: 990;
+  flex-wrap: nowrap;
   gap: 1rem;
 }
 
@@ -57,13 +57,31 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-shrink: 0;
 }
 
-.userInfo {
-  font-weight: 500;
+.userMenuContainer {
+  position: relative;
+  display: inline-block;
 }
 
-.authLink, .authButton {
+.userInfoButton {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 8px 10px;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.userInfoButton:hover {
+  text-decoration: underline;
+}
+
+.authLink {
   color: white;
   text-decoration: none;
   padding: 0.5rem 1rem;
@@ -73,42 +91,83 @@
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s;
   font-size: 0.9rem;
+  white-space: nowrap;
 }
 
-.authLink:hover, .authButton:hover {
+.authLink:hover {
   background-color: white;
   color: #FF0000;
 }
 
+.mobileControls {
+  display: none;
+}
+
+.hamburgerIcon {
+  color: white;
+  font-size: 28px;
+  display: block;
+}
+
+.desktopOnly {
+  display: flex;
+}
+
+.mobileOnly {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .header {
-    flex-direction: column;
-    padding: 1rem;
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+    justify-content: space-between;
   }
+
+  .mobileControls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    order: 1;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  .brand {
+    order: 2;
+    flex-grow: 1;
+    text-align: center;
+  }
+
+  .brand a {
+    font-size: 1.3rem;
+  }
+
   .searchContainer {
     order: 3;
     width: 100%;
     max-width: none;
-    margin-top: 0.5rem;
+    margin-top: 0.75rem;
+    min-width: unset;
   }
-  .userSection {
-    order: 2;
-    width: 100%;
-    justify-content: center;
-    margin-top: 0.5rem;
-  }
-  .brand {
-    order: 1;
-    align-self: center;
+
+  .userSection.desktopOnly {
+    display: none;
   }
 }
 
 @media (max-width: 480px) {
-  .authLink, .authButton {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.85rem;
+  .header {
+    gap: 0.5rem;
   }
-  .searchContainer input[type="search"], .searchContainer button {
+
+  .brand a {
+    font-size: 1.2rem;
+  }
+
+  .searchContainer input[type="search"],
+  .searchContainer button {
     font-size: 0.9rem;
   }
 }
