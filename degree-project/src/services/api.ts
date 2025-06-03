@@ -29,13 +29,14 @@ export interface RecipeSearchResult {
 }
 
 export interface ScrapedRecipeData {
-  recipe_name?: string | null;
+  title?: string | null;
+  servings?: number | null;
   ingredients?: string[] | null;
   directions?: string[] | null;
   url: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   timing?: any | null;
-  img_url?: string | null;
+  image_url?: string | null;
 }
 
 export interface AnalyzeTaskResponse {
@@ -57,6 +58,24 @@ export interface TaskStatusResponse {
   status: 'PENDING' | 'STARTED' | 'SUCCESS' | 'FAILURE' | 'RETRY' | string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   result?: TaskResult | any | null;
+}
+
+export type AnalysisType = 'SUBSTITUTE_INGREDIENT' | 'ADAPT_DIET' | 'SCALE_PORTIONS';
+
+export interface AdaptationRequest {
+  type: AnalysisType;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  details: Record<string, any>;
+}
+
+export interface RecipeAdaptationRequest {
+  recipe_data: ScrapedRecipeData;
+  adaptation: AdaptationRequest;
+}
+
+export interface RecipeAdaptationResponse {
+  summary: string;
+  updated_recipe: ScrapedRecipeData;
 }
 
 export const searchRecipesAPI = async (query: string): Promise<RecipeSearchResult[]> => {
@@ -84,6 +103,12 @@ export const getTaskStatusAPI = async (taskId: string): Promise<TaskStatusRespon
     return response.data;
 };
 
+export const adaptRecipeAPI = async (request: RecipeAdaptationRequest): Promise<RecipeAdaptationResponse> => {
+  console.log(`[api.ts] Calling adaptRecipeAPI with type: ${request.adaptation.type}`);
+  const response = await apiClient.post<RecipeAdaptationResponse>('/recipes/adapt', request);
+  console.log("Respuestita jijijijiji:", response.data)
+  return response.data;
+};
 
 export interface User {
   id: string;
@@ -99,8 +124,7 @@ export interface AuthToken {
 }
 
 export interface Recipe {
-    id: string;
-    recipe_name: string;
+    title: string;
     prep_time?: number | null;
     cook_time?: number | null;
     total_time?: number | null;
@@ -113,7 +137,7 @@ export interface Recipe {
     cuisine_path?: string | null;
     nutrition?: string | null;
     timing?: string | null;
-    img_url: string;
+    image_url: string;
     created_at?: string;
     updated_at?: string | null;
 }
