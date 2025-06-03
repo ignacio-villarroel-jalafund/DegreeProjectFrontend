@@ -34,7 +34,6 @@ export interface ScrapedRecipeData {
   ingredients?: string[] | null;
   directions?: string[] | null;
   url: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   timing?: any | null;
   image_url?: string | null;
 }
@@ -56,7 +55,6 @@ export interface TaskResult {
 export interface TaskStatusResponse {
   task_id: string;
   status: 'PENDING' | 'STARTED' | 'SUCCESS' | 'FAILURE' | 'RETRY' | string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   result?: TaskResult | any | null;
 }
 
@@ -64,7 +62,6 @@ export type AnalysisType = 'SUBSTITUTE_INGREDIENT' | 'ADAPT_DIET' | 'SCALE_PORTI
 
 export interface AdaptationRequest {
   type: AnalysisType;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   details: Record<string, any>;
 }
 
@@ -79,7 +76,6 @@ export interface RecipeAdaptationResponse {
 }
 
 export const searchRecipesAPI = async (query: string): Promise<RecipeSearchResult[]> => {
-    console.log(`[api.ts] Calling searchRecipesAPI with query: ${query}`);
     const response = await apiClient.get<RecipeSearchResult[]>('/recipes/search', {
         params: { query }
     });
@@ -119,6 +115,19 @@ export const getIngredientInfoAPI = async (textQuery: string): Promise<Ingredien
     params: { text_query: textQuery }
   });
 
+  return response.data;
+};
+
+export interface SubdivisionData {
+  country_queried: string;
+  subdivisions: string[];
+  message?: string;
+}
+
+export const getSubdivisionsAPI = async (country: string, lang: string = 'es'): Promise<SubdivisionData> => {
+  const response = await apiClient.get<SubdivisionData>('/locations/subdivisions', {
+    params: { country, lang }
+  });
   return response.data;
 };
 

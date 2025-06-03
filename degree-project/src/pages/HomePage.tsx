@@ -1,14 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSearch } from "../contexts/SearchContext";
-import { RecipeSearchResult } from "../services/api";
+import { RecipeSearchResult, getSubdivisionsAPI, SubdivisionData } from "../services/api";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
 import styles from "./HomePage.module.css";
-
-interface LocationInfo {
-  city: string;
-  country: string;
-}
+import { useLocation, LocationInfo } from "../hooks/useLocation";
 
 type ActiveButtonType = "local" | "nacional" | "popular";
 
@@ -16,90 +12,106 @@ const HomePage: React.FC = () => {
   const {
     searchResults,
     isLoadingSearch,
-    searchError,
+    searchError: searchContextError,
     handleSearch,
   } = useSearch();
 
-  const [locationInfo, setLocationInfo] = useState<LocationInfo | null>(null);
-  const [isLoadingLocation, setIsLoadingLocation] = useState(true);
+  const {
+    locationInfo: activeLocation,
+    isLoading: isLoadingLocation,
+    error: locationError,
+    isOverridden,
+    detectedIpLocation,
+    overrideLocation,
+    clearOverriddenLocation,
+  } = useLocation();
+
   const [pageTitle, setPageTitle] = useState("Buscando recetas para ti...");
   const [activeButton, setActiveButton] = useState<ActiveButtonType | null>(null);
 
-  const ipinfoToken = import.meta.env.VITE_IPINFO_TOKEN;
+  const [showLocationCorrection, setShowLocationCorrection] = useState(false);
+  const [subdivisions, setSubdivisions] = useState<string[]>([]);
+  const [selectedSubdivision, setSelectedSubdivision] = useState<string>("");
+  const [isLoadingSubdivisions, setIsLoadingSubdivisions] = useState(false);
+  const [correctionUiError, setCorrectionUiError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchLocationAndSearch = async () => {
-      setIsLoadingLocation(true);
+    if (isLoadingLocation) {
+      setPageTitle("Detectando tu ubicación...");
+      return;
+    }
 
-      if (!ipinfoToken) {
-        console.error("HomePage: El token de IPINFO no está configurado en las variables de entorno (VITE_IPINFO_TOKEN).");
-        const fallbackLocation: LocationInfo = { city: "cochabamba", country: "BO" };
-        setLocationInfo(fallbackLocation);
-        setPageTitle("Recetas populares internacionalmente (fallback por token)");
-        try {
-          await handleSearch("Recetas internacionales");
-          setActiveButton("popular");
-        } catch (searchFallbackError) {
-          console.error("HomePage: Error durante el fallback search (sin token):", searchFallbackError);
-        } finally {
-          setIsLoadingLocation(false);
+    if (locationError && !activeLocation) {
+      setPageTitle("Recetas populares internacionalmente (fallback)");
+      console.error("HomePage: Error de ubicación severo:", locationError);
+      handleSearch("Recetas internacionales");
+      setActiveButton("popular");
+      return;
+    }
+
+    if (activeLocation) {
+      setPageTitle(`Recetas populares en ${activeLocation.city}`);
+      handleSearch(`Recetas de ${activeLocation.city}`);
+      setActiveButton("local");
+    }
+  }, [activeLocation, isLoadingLocation, locationError, handleSearch]);
+
+  const handleOpenCorrectionUI = async () => {
+    if (!activeLocation?.countryCode) {
+      setCorrectionUiError("No se ha detectado un país para buscar subdivisiones.");
+      return;
+    }
+    setShowLocationCorrection(true);
+    setIsLoadingSubdivisions(true);
+    setCorrectionUiError(null);
+    setSubdivisions([]);
+    setSelectedSubdivision("");
+
+    try {
+      const data: SubdivisionData = await getSubdivisionsAPI(activeLocation.countryCode);
+      if (data.subdivisions && data.subdivisions.length > 0) {
+        setSubdivisions(data.subdivisions);
+        if (data.subdivisions.includes(activeLocation.city)) {
+          setSelectedSubdivision(activeLocation.city);
+        } else if (activeLocation.countryCode === "BO" && activeLocation.city.includes("Department")) {
+          const cityNameOnly = activeLocation.city.replace(" Department", "");
+          if (data.subdivisions.includes(cityNameOnly)) {
+            setSelectedSubdivision(cityNameOnly);
+          }
         }
-        return;
+      } else {
+        setCorrectionUiError(data.message || "No se encontraron subdivisiones para este país.");
+        setSubdivisions([]);
       }
+    } catch (error: any) {
+      console.error("Error fetching subdivisions:", error);
+      setCorrectionUiError(error.response?.data?.detail || error.message || "Error al cargar las subdivisiones.");
+      setSubdivisions([]);
+    } finally {
+      setIsLoadingSubdivisions(false);
+    }
+  };
 
-      const apiUrl = `https://ipinfo.io/json?token=${ipinfoToken}`;
+  const handleConfirmNewLocation = async () => {
+    if (!selectedSubdivision || !activeLocation) {
+      setCorrectionUiError("Por favor, selecciona una ubicación.");
+      return;
+    }
 
-      try {
-        console.log(`HomePage: Fetching location from ${apiUrl}`);
-        const response = await fetch(apiUrl);
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          console.error(`HomePage: Error HTTP ${response.status} de ipinfo.io:`, errorData.error?.message || response.statusText);
-          throw new Error(`Error ${response.status} de ipinfo.io: ${errorData.error?.message || 'No se pudo obtener la ubicación.'}`);
-        }
-
-        const data = await response.json();
-
-        if (!data.region || !data.country) {
-            console.warn("HomePage: La respuesta de ipinfo.io no incluyó ciudad o país.", data);
-            throw new Error("Respuesta incompleta de ipinfo.io.");
-        }
-
-        const location: LocationInfo = {
-          city: data.city,
-          country: data.country,
-        };
-
-        console.log("HomePage: Ubicación obtenida de ipinfo.io:", location);
-        setLocationInfo(location);
-
-        const initialQuery = `Recetas de ${location.city}`;
-        setPageTitle(`Recetas populares en ${location.city}`);
-        await handleSearch(initialQuery);
-        setActiveButton("local");
-
-      } catch (error: any) {
-        console.error("HomePage: Error fetching location from ipinfo.io or initial search:", error.message || error);
-        const fallbackLocation: LocationInfo = { city: "cochabamba", country: "BO" };
-        setLocationInfo(fallbackLocation);
-        setPageTitle("Recetas populares internacionalmente (fallback por error)");
-        try {
-            await handleSearch("Recetas internacionales");
-            setActiveButton("popular");
-        } catch (searchFallbackError) {
-            console.error("HomePage: Error during fallback search:", searchFallbackError);
-        }
-      } finally {
-        setIsLoadingLocation(false);
-      }
+    const newLocationForOverride: LocationInfo = {
+      ...activeLocation,
+      city: selectedSubdivision,
     };
+    overrideLocation(newLocationForOverride);
+    setShowLocationCorrection(false);
+  };
+  
+  const handleResetLocation = async () => {
+    setShowLocationCorrection(false);
+    await clearOverriddenLocation();
+  };
 
-    fetchLocationAndSearch();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ipinfoToken]);
-
-  const isLoading = isLoadingLocation || isLoadingSearch;
+  const isLoadingOverall = isLoadingLocation || isLoadingSearch;
 
   const renderResults = (results: RecipeSearchResult[]) => (
     <div className={styles.searchResultsList}>
@@ -131,32 +143,28 @@ const HomePage: React.FC = () => {
       <div className={styles.suggestionButtons}>
         <button
           onClick={() => {
-            setActiveButton("local");
-            setPageTitle(
-              `Recetas populares en ${locationInfo?.city || "la región"}`
-            );
-            handleSearch(`Recetas de ${locationInfo?.city || "cochabamba"}`);
+            if (activeLocation) {
+              setActiveButton("local");
+              setPageTitle(`Recetas populares en ${activeLocation.city}`);
+              handleSearch(`Recetas de ${activeLocation.city}`);
+            }
           }}
-          className={`${styles.suggestionButton} ${
-            activeButton === "local" ? styles.active : ""
-          }`}
-          disabled={isLoading || !locationInfo}
+          className={`${styles.suggestionButton} ${activeButton === "local" ? styles.active : ""}`}
+          disabled={isLoadingOverall || !activeLocation}
         >
           Recetas Locales
         </button>
         <button
           onClick={() => {
-            setActiveButton("nacional");
-            const countryDisplay = locationInfo?.country === "BO" ? "Bolivia" : (locationInfo?.country || "el país");
-            setPageTitle(
-              `Recetas populares en ${countryDisplay}`
-            );
-            handleSearch(`Recetas de ${countryDisplay === "el país" ? "bolivia" : countryDisplay}`);
+            if (activeLocation) {
+              setActiveButton("nacional");
+              const countryDisplay = activeLocation.countryFullName || activeLocation.countryCode;
+              setPageTitle(`Recetas populares en ${countryDisplay}`);
+              handleSearch(`Recetas de ${countryDisplay}`);
+            }
           }}
-          className={`${styles.suggestionButton} ${
-            activeButton === "nacional" ? styles.active : ""
-          }`}
-          disabled={isLoading || !locationInfo}
+          className={`${styles.suggestionButton} ${activeButton === "nacional" ? styles.active : ""}`}
+          disabled={isLoadingOverall || !activeLocation}
         >
           Recetas Nacionales
         </button>
@@ -166,33 +174,104 @@ const HomePage: React.FC = () => {
             setPageTitle("Recetas populares internacionalmente");
             handleSearch("Recetas internacionales");
           }}
-          className={`${styles.suggestionButton} ${
-            activeButton === "popular" ? styles.active : ""
-          }`}
-          disabled={isLoading}
+          className={`${styles.suggestionButton} ${activeButton === "popular" ? styles.active : ""}`}
+          disabled={isLoadingOverall}
         >
           Recetas Internacionales
         </button>
       </div>
 
       <h2 className={styles.pageTitle}>
-        {isLoading ? "Buscando..." : pageTitle}
+        {isLoadingLocation
+          ? "Detectando ubicación..."
+          : isLoadingSearch && activeLocation
+          ? `Buscando en ${activeLocation.city}...`
+          : pageTitle}
       </h2>
 
-      {isLoading && <LoadingSpinner />}
-
-      {!isLoading && searchError && (
-        <p className={styles.errorText}>{searchError}</p>
+      {locationError && !isLoadingLocation && !showLocationCorrection && !activeLocation && (
+         <div className={styles.locationCorrectionTrigger}>
+            <p className={styles.errorTextSmall}>Error al detectar ubicación: {locationError}. Mostrando contenido global.</p>
+         </div>
+      )}
+      
+      {!showLocationCorrection && activeLocation && !isLoadingLocation && (
+        <div className={styles.locationInfoArea}>
+          <div className={styles.locationText}>
+            <span>
+              Ubicación para recetas: {activeLocation.city}, {activeLocation.countryFullName}.
+            </span>
+            <button onClick={handleOpenCorrectionUI} className={styles.linkButton}>
+              ¿No es correcto?
+            </button>
+          </div>
+          {isOverridden && detectedIpLocation && (
+            <div className={styles.detectedLocationInfo}>
+              <span>(Detectada: {detectedIpLocation.city}, {detectedIpLocation.countryFullName})</span>
+              <button onClick={handleResetLocation} className={`${styles.linkButton} ${styles.resetButton}`}>
+                Usar ubicación detectada
+              </button>
+            </div>
+          )}
+        </div>
       )}
 
-      {!isLoading &&
-        !searchError &&
+      {showLocationCorrection && activeLocation && (
+        <div className={styles.locationCorrectionUI}>
+          <h4>Corregir ubicación para {activeLocation.countryFullName}</h4>
+          {isLoadingSubdivisions && <LoadingSpinner />}
+          {!isLoadingSubdivisions && subdivisions.length > 0 && (
+            <div className={styles.selectContainer}>
+              <select
+                value={selectedSubdivision}
+                onChange={(e) => setSelectedSubdivision(e.target.value)}
+                className={styles.subdivisionSelect}
+              >
+                <option value="">
+                  -- Selecciona tu {activeLocation.countryCode === "BO" ? "departamento" : activeLocation.countryCode === "US" ? "estado" : "región/provincia"} --
+                </option>
+                {subdivisions.map((sub) => (
+                  <option key={sub} value={sub}>
+                    {sub}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={handleConfirmNewLocation}
+                className={styles.confirmButton}
+                disabled={!selectedSubdivision || selectedSubdivision === activeLocation.city}
+              >
+                Actualizar Ubicación
+              </button>
+            </div>
+          )}
+          {correctionUiError && <p className={styles.errorTextSmall}>{correctionUiError}</p>}
+          {!isLoadingSubdivisions && subdivisions.length === 0 && !correctionUiError && (
+            <p className={styles.infoText}>No hay subdivisiones disponibles para este país o ya se mostraron.</p>
+          )}
+          <button
+            onClick={() => setShowLocationCorrection(false)}
+            className={`${styles.cancelButton} ${styles.correctionCancelButton}`}
+          >
+            Cancelar Corrección
+          </button>
+        </div>
+      )}
+
+      {isLoadingOverall && !showLocationCorrection && <LoadingSpinner />}
+
+      {!isLoadingOverall && searchContextError && (
+        <p className={styles.errorText}>{searchContextError}</p>
+      )}
+
+      {!isLoadingOverall &&
+        !searchContextError &&
         searchResults &&
         searchResults.length > 0 &&
         renderResults(searchResults)}
       
-      {!isLoading && !searchError && searchResults && searchResults.length === 0 && (
-        <p className={styles.errorText}>No se encontraron recetas para tu búsqueda.</p>
+      {!isLoadingOverall && !searchContextError && searchResults && searchResults.length === 0 && (
+        <p className={styles.infoText}>No se encontraron recetas para tu búsqueda.</p>
       )}
     </div>
   );
