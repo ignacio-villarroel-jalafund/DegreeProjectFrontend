@@ -104,9 +104,21 @@ export const getTaskStatusAPI = async (taskId: string): Promise<TaskStatusRespon
 };
 
 export const adaptRecipeAPI = async (request: RecipeAdaptationRequest): Promise<RecipeAdaptationResponse> => {
-  console.log(`[api.ts] Calling adaptRecipeAPI with type: ${request.adaptation.type}`);
   const response = await apiClient.post<RecipeAdaptationResponse>('/recipes/adapt', request);
-  console.log("Respuestita jijijijiji:", response.data)
+  return response.data;
+};
+
+export interface IngredientInfoResponse {
+  name: string | null;
+  image_url: string | null;
+  search_url: string | null;
+}
+
+export const getIngredientInfoAPI = async (textQuery: string): Promise<IngredientInfoResponse> => {
+  const response = await apiClient.get<IngredientInfoResponse>('/recipes/ingredient-info', {
+    params: { text_query: textQuery }
+  });
+
   return response.data;
 };
 
