@@ -5,8 +5,10 @@ import { RecipeSearchResult, getSubdivisionsAPI, SubdivisionData } from "../serv
 import LoadingSpinner from "../components/UI/LoadingSpinner";
 import styles from "./HomePage.module.css";
 import { useLocation, LocationInfo } from "../hooks/useLocation";
+import { FiChevronDown } from "react-icons/fi";
 
 type ActiveButtonType = "local" | "nacional" | "popular";
+const ACTIVE_BUTTON_STORAGE_KEY = 'homePageActiveButtonSelection';
 
 const HomePage: React.FC = () => {
   const {
@@ -27,7 +29,10 @@ const HomePage: React.FC = () => {
   } = useLocation();
 
   const [pageTitle, setPageTitle] = useState("Buscando recetas para ti...");
-  const [activeButton, setActiveButton] = useState<ActiveButtonType | null>(null);
+  
+  const [activeButton, setActiveButton] = useState<ActiveButtonType | null>(() => {
+    return sessionStorage.getItem(ACTIVE_BUTTON_STORAGE_KEY) as ActiveButtonType | null;
+  });
 
   const [showLocationCorrection, setShowLocationCorrection] = useState(false);
   const [subdivisions, setSubdivisions] = useState<string[]>([]);
@@ -36,25 +41,89 @@ const HomePage: React.FC = () => {
   const [correctionUiError, setCorrectionUiError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (activeButton) {
+      sessionStorage.setItem(ACTIVE_BUTTON_STORAGE_KEY, activeButton);
+    } else {
+      sessionStorage.removeItem(ACTIVE_BUTTON_STORAGE_KEY);
+    }
+  }, [activeButton]);
+
+  useEffect(() => {
     if (isLoadingLocation) {
       setPageTitle("Detectando tu ubicación...");
       return;
     }
 
-    if (locationError && !activeLocation) {
-      setPageTitle("Recetas populares internacionalmente (fallback)");
-      console.error("HomePage: Error de ubicación severo:", locationError);
-      handleSearch("Recetas internacionales");
-      setActiveButton("popular");
-      return;
+    let currentActiveButton = activeButton;
+    let needsToSetButton = false;
+
+    if (!currentActiveButton) {
+      needsToSetButton = true;
+      if (locationError || !activeLocation) {
+        currentActiveButton = "popular";
+      } else {
+        currentActiveButton = "local";
+      }
     }
 
+    if (currentActiveButton === "local") {
+      if (activeLocation) {
+        setPageTitle(`Recetas populares en ${activeLocation.city}`);
+        handleSearch(`Recetas de ${activeLocation.city}`);
+      } else {
+        setPageTitle("Recetas populares internacionalmente (fallback)");
+        handleSearch("Recetas internacionales");
+        currentActiveButton = "popular";
+        needsToSetButton = true;
+      }
+    } else if (currentActiveButton === "nacional") {
+      if (activeLocation) {
+        const countryDisplay = activeLocation.countryFullName || activeLocation.countryCode;
+        setPageTitle(`Recetas populares en ${countryDisplay}`);
+        handleSearch(`Recetas de ${countryDisplay}`);
+      } else {
+        setPageTitle("Recetas populares internacionalmente (fallback)");
+        handleSearch("Recetas internacionales");
+        currentActiveButton = "popular";
+        needsToSetButton = true;
+      }
+    } else { 
+      setPageTitle("Recetas populares internacionalmente");
+      handleSearch("Recetas internacionales");
+      if (currentActiveButton !== "popular") {
+          currentActiveButton = "popular";
+          needsToSetButton = true;
+      }
+    }
+    
+    if (needsToSetButton || activeButton !== currentActiveButton) {
+      setActiveButton(currentActiveButton);
+    }
+
+  }, [activeLocation, isLoadingLocation, locationError, handleSearch, activeButton]);
+
+  const handleLocalClick = () => {
     if (activeLocation) {
+      setActiveButton("local");
       setPageTitle(`Recetas populares en ${activeLocation.city}`);
       handleSearch(`Recetas de ${activeLocation.city}`);
-      setActiveButton("local");
     }
-  }, [activeLocation, isLoadingLocation, locationError, handleSearch]);
+  };
+
+  const handleNacionalClick = () => {
+    if (activeLocation) {
+      setActiveButton("nacional");
+      const countryDisplay = activeLocation.countryFullName || activeLocation.countryCode;
+      setPageTitle(`Recetas populares en ${countryDisplay}`);
+      handleSearch(`Recetas de ${countryDisplay}`);
+    }
+  };
+
+  const handlePopularClick = () => {
+    setActiveButton("popular");
+    setPageTitle("Recetas populares internacionalmente");
+    handleSearch("Recetas internacionales");
+  };
 
   const handleOpenCorrectionUI = async () => {
     if (!activeLocation?.countryCode) {
@@ -78,6 +147,8 @@ const HomePage: React.FC = () => {
           if (data.subdivisions.includes(cityNameOnly)) {
             setSelectedSubdivision(cityNameOnly);
           }
+        } else if (data.subdivisions.length > 0 && !selectedSubdivision) {
+            setSelectedSubdivision(data.subdivisions[0]); 
         }
       } else {
         setCorrectionUiError(data.message || "No se encontraron subdivisiones para este país.");
@@ -142,38 +213,21 @@ const HomePage: React.FC = () => {
     <div className={styles.homePageContainer}>
       <div className={styles.suggestionButtons}>
         <button
-          onClick={() => {
-            if (activeLocation) {
-              setActiveButton("local");
-              setPageTitle(`Recetas populares en ${activeLocation.city}`);
-              handleSearch(`Recetas de ${activeLocation.city}`);
-            }
-          }}
+          onClick={handleLocalClick}
           className={`${styles.suggestionButton} ${activeButton === "local" ? styles.active : ""}`}
           disabled={isLoadingOverall || !activeLocation}
         >
           Recetas Locales
         </button>
         <button
-          onClick={() => {
-            if (activeLocation) {
-              setActiveButton("nacional");
-              const countryDisplay = activeLocation.countryFullName || activeLocation.countryCode;
-              setPageTitle(`Recetas populares en ${countryDisplay}`);
-              handleSearch(`Recetas de ${countryDisplay}`);
-            }
-          }}
+          onClick={handleNacionalClick}
           className={`${styles.suggestionButton} ${activeButton === "nacional" ? styles.active : ""}`}
           disabled={isLoadingOverall || !activeLocation}
         >
           Recetas Nacionales
         </button>
         <button
-          onClick={() => {
-            setActiveButton("popular");
-            setPageTitle("Recetas populares internacionalmente");
-            handleSearch("Recetas internacionales");
-          }}
+          onClick={handlePopularClick}
           className={`${styles.suggestionButton} ${activeButton === "popular" ? styles.active : ""}`}
           disabled={isLoadingOverall}
         >
@@ -182,10 +236,10 @@ const HomePage: React.FC = () => {
       </div>
 
       <h2 className={styles.pageTitle}>
-        {isLoadingLocation
+        {isLoadingLocation && !pageTitle.includes("Detectando")
           ? "Detectando ubicación..."
-          : isLoadingSearch && activeLocation
-          ? `Buscando en ${activeLocation.city}...`
+          : isLoadingSearch && activeLocation && activeButton !== "popular"
+          ? `Buscando en ${activeButton === "local" ? activeLocation.city : (activeLocation.countryFullName || activeLocation.countryCode)}...`
           : pageTitle}
       </h2>
 
@@ -222,20 +276,24 @@ const HomePage: React.FC = () => {
           {isLoadingSubdivisions && <LoadingSpinner />}
           {!isLoadingSubdivisions && subdivisions.length > 0 && (
             <div className={styles.selectContainer}>
-              <select
-                value={selectedSubdivision}
-                onChange={(e) => setSelectedSubdivision(e.target.value)}
-                className={styles.subdivisionSelect}
-              >
-                <option value="">
-                  -- Selecciona tu {activeLocation.countryCode === "BO" ? "departamento" : activeLocation.countryCode === "US" ? "estado" : "región/provincia"} --
-                </option>
-                {subdivisions.map((sub) => (
-                  <option key={sub} value={sub}>
-                    {sub}
+              {/* Wrap select and add icon */}
+              <div className={styles.selectWrapper}>
+                <select
+                  value={selectedSubdivision}
+                  onChange={(e) => setSelectedSubdivision(e.target.value)}
+                  className={styles.subdivisionSelect}
+                >
+                  <option value="">
+                    -- Selecciona tu {activeLocation.countryCode === "BO" ? "departamento" : activeLocation.countryCode === "US" ? "estado" : "región/provincia"} --
                   </option>
-                ))}
-              </select>
+                  {subdivisions.map((sub) => (
+                    <option key={sub} value={sub}>
+                      {sub}
+                    </option>
+                  ))}
+                </select>
+                <FiChevronDown className={styles.selectArrowIcon} />
+              </div>
               <button
                 onClick={handleConfirmNewLocation}
                 className={styles.confirmButton}

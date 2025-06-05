@@ -5,6 +5,7 @@ import styles from './FormPage.module.css';
 import { useAuth } from '../hooks/useAuth';
 
 const RegisterPage: React.FC = () => {
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -27,33 +28,44 @@ const RegisterPage: React.FC = () => {
       setError('La contraseña debe tener al menos 8 caracteres.');
       return;
     }
+    if (!username.trim()) {
+      setError('El nombre de usuario es requerido.');
+      return;
+    }
 
     setIsLoading(true);
 
     try {
-      console.log('Attempting registration...');
       await apiClient.post<User>(
         '/users',
-        { email, password }
+        { username, email, password }
       );
-      console.log('Registration successful online.');
       alert('¡Registro exitoso! Ahora puedes iniciar sesión.');
       navigate('/login');
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      console.error('Registration failed:', err);
       if (!isOnline || (err.message && err.message.toLowerCase().includes('network error'))) {
-          console.log('Registration failed due to offline status. Attempting background sync.');
-
+          setError('Error de red. Por favor, verifica tu conexión e intenta de nuevo.');
       } else if (err.response && err.response.data && err.response.data.detail) {
-         if (err.response.status === 400 && typeof err.response.data.detail === 'string' && err.response.data.detail.includes("registrado")) {
-              setError('Este correo electrónico ya está registrado.');
+         if (err.response.status === 400) {
+            if (typeof err.response.data.detail === 'string') {
+                if (err.response.data.detail.toLowerCase().includes("email already registered")) {
+                    setError('Este correo electrónico ya está registrado.');
+                } else if (err.response.data.detail.toLowerCase().includes("username already registered")) {
+                    setError('Este nombre de usuario ya está registrado.');
+                } else {
+                    setError(err.response.data.detail);
+                }
+            } else {
+                 setError('Error en los datos enviados.');
+            }
          } else if (err.response.status === 422) {
               let validationErrors = 'Error de validación. ';
               if (Array.isArray(err.response.data.detail)) {
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  validationErrors += err.response.data.detail.map((e: any) => `${e.loc[e.loc.length-1]}: ${e.msg}`).join('; ');
+                  validationErrors += err.response.data.detail.map((e: any) => {
+                      const field = e.loc && e.loc.length > 1 ? e.loc[1] : 'campo';
+                      return `${field}: ${e.msg}`;
+                  }).join('; ');
               } else {
                   validationErrors += 'Verifica los datos ingresados.';
               }
@@ -77,6 +89,17 @@ const RegisterPage: React.FC = () => {
       <form onSubmit={handleSubmit}>
         {error && <p className={styles.errorMessage}>{error}</p>}
         {info && <p className={styles.infoMessage}>{info}</p>}
+        <div className={styles.formGroup}>
+          <label htmlFor="username">Nombre de Usuario:</label>
+          <input
+            type="text"
+            id="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            disabled={isLoading}
+          />
+        </div>
          <div className={styles.formGroup}>
           <label htmlFor="email">Correo Electrónico:</label>
           <input

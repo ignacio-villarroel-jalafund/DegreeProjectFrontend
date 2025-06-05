@@ -99,7 +99,7 @@ const Header: React.FC = () => {
                 onClick={toggleDesktopMenu}
                 className={styles.userInfoButton}
               >
-                Hola, {user?.email}
+                Hola, {user?.username}
               </button>
               {isDesktopMenuOpen && (
                 <SideMenu

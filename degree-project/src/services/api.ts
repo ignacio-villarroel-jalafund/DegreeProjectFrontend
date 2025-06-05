@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -168,12 +168,33 @@ export const findSupermarketsAPI = async (
   return response.data;
 };
 
+export interface UserUpdateDetailsPayload {
+  username?: string;
+  email?: string;
+}
+
+export interface UserUpdatePasswordPayload {
+  current_password: string;
+  new_password: string;
+  confirm_password: string;
+}
+
+export const updateUserDetailsAPI = async (payload: UserUpdateDetailsPayload): Promise<User> => {
+  const response = await apiClient.put<User>('/users/me/details', payload);
+  return response.data;
+};
+
+export const updateUserPasswordAPI = async (payload: UserUpdatePasswordPayload): Promise<void> => {
+  await apiClient.put('/users/me/password', payload);
+};
+
 export interface User {
   id: string;
+  username: string;
   email: string;
   is_active: boolean;
-  created_at: string;
-  updated_at?: string | null;
+  created_at: Date;
+  updated_at?: Date | null;
 }
 
 export interface AuthToken {
