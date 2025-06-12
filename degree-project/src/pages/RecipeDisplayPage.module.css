@@ -804,3 +804,102 @@ body {
   text-align: center;
   width: 100%;
 }
+
+.recipeHeader {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  align-items: stretch;
+}
+
+.recipeHeader > .imageContainer,
+.recipeHeader > .nutritionInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.nutritionInfo {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  background-color: #fcfcfc;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.nutritionTitle {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+  color: var(--text-color);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.75rem;
+}
+
+.nutritionList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.nutritionList li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.nutritionList li:last-child {
+  border-bottom: none;
+}
+
+.nutritionList li span:first-child {
+  font-weight: 500;
+  color: #333;
+}
+
+.nutritionList li span:last-child {
+  font-weight: 700;
+  color: var(--primary-color);
+  font-size: 1.1rem;
+}
+
+.nutritionSource {
+  font-size: 0.75rem;
+  color: #888;
+  text-align: center;
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.nutritionNotAvailable {
+  color: #6c757d;
+  font-style: italic;
+  margin: auto 0;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .recipeHeader {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .nutritionInfo {
+    padding: 1.2rem;
+  }
+}

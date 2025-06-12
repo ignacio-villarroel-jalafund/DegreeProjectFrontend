@@ -28,6 +28,14 @@ export interface RecipeSearchResult {
   image_url: string;
 }
 
+export interface NutritionInfo {
+  calories?: number | null;
+  protein?: number | null;
+  carbohydrates?: number | null;
+  fat?: number | null;
+  source: string;
+}
+
 export interface ScrapedRecipeData {
   title?: string | null;
   servings?: number | null;
@@ -36,6 +44,7 @@ export interface ScrapedRecipeData {
   url: string;
   timing?: any | null;
   image_url?: string | null;
+  nutrition?: NutritionInfo | null;
 }
 
 export interface AnalyzeTaskResponse {
