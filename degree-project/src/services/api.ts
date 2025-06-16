@@ -28,6 +28,15 @@ export interface RecipeSearchResult {
   image_url: string;
 }
 
+export interface HistoryRead {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  recipe_data: ScrapedRecipeData;
+  source_url: string | null;
+  is_adapted: boolean;
+}
+
 export interface NutritionInfo {
   fat_total_g?: number | null;
   fat_saturated_g?: number | null;
@@ -127,6 +136,12 @@ export const getIngredientInfoAPI = async (textQuery: string): Promise<Ingredien
     params: { text_query: textQuery }
   });
 
+  return response.data;
+};
+
+export const getUserHistoryAPI = async (): Promise<HistoryRead[]> => {
+  const response = await apiClient.get<HistoryRead[]>('/users/me/history');
+  console.log(response.data)
   return response.data;
 };
 
