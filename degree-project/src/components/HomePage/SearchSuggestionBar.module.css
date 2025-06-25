@@ -1,0 +1,39 @@
+.suggestionButtons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.5rem;
+}
+
+.suggestionButton {
+  background-color: transparent;
+  color: #FF0000;
+  border: 2px solid #FF0000;
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.suggestionButton:hover:not(:disabled) {
+  background-color: #FF0000;
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+}
+
+.suggestionButton:disabled {
+  border-color: #ccc;
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.suggestionButton.active {
+  background-color: #FF0000;
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+}

@@ -1,0 +1,65 @@
+.searchResultsList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.searchResultItem {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.searchResultItem:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.imageWrapper {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background-color: #f0f0f0;
+}
+
+.recipeImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.itemContent {
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.itemContent h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+  flex-grow: 1;
+}
+
+.detailsLink {
+  color: #FF0000;
+  font-weight: 600;
+  text-decoration: none;
+  align-self: flex-start;
+}
+
+.infoText, .errorText {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #6c757d;
+  padding: 2rem;
+}
+
+.errorText {
+  color: #c0392b;
+}
