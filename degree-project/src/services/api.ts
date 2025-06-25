@@ -29,10 +29,14 @@ export interface RecipeSearchResult {
 }
 
 export interface NutritionInfo {
-  calories?: number | null;
-  protein?: number | null;
+  fat_total?: number | null;
+  fat_saturated?: number | null;
   carbohydrates?: number | null;
-  fat?: number | null;
+  fiber?: number | null;
+  sugar?: number | null;
+  sodium?: number | null;
+  potassium?: number | null;
+  cholesterol?: number | null;
   source: string;
 }
 
@@ -42,7 +46,6 @@ export interface ScrapedRecipeData {
   ingredients?: string[] | null;
   directions?: string[] | null;
   url: string;
-  timing?: any | null;
   image_url?: string | null;
   nutrition?: NutritionInfo | null;
 }
@@ -213,9 +216,6 @@ export interface AuthToken {
 
 export interface Recipe {
     title: string;
-    prep_time?: number | null;
-    cook_time?: number | null;
-    total_time?: number | null;
     servings?: number | null;
     yield_amount?: string | null;
     ingredients: string;

@@ -731,45 +731,47 @@ const RecipeDisplayPage: React.FC = () => {
         />
       </div>
 
-      <div className={styles.nutritionInfo}>
-        <h3 className={styles.nutritionTitle}>Información Nutricional</h3>
-        {scrapedData.nutrition ? (
-          <>
-            <ul className={styles.nutritionList}>
-              <li>
-                <span>Calorías</span>
-                <span>
-                  {scrapedData.nutrition.calories?.toFixed(0) ?? "N/A"} kcal
-                </span>
-              </li>
-              <li>
-                <span>Proteínas</span>
-                <span>
-                  {scrapedData.nutrition.protein?.toFixed(1) ?? "N/A"} g
-                </span>
-              </li>
-              <li>
-                <span>Carbohidratos</span>
-                <span>
-                  {scrapedData.nutrition.carbohydrates?.toFixed(1) ?? "N/A"} g
-                </span>
-              </li>
-              <li>
-                <span>Grasas</span>
-                <span>{scrapedData.nutrition.fat?.toFixed(1) ?? "N/A"} g</span>
-              </li>
-            </ul>
-            <p className={styles.nutritionSource}>
-              * {scrapedData.nutrition.source}
+        <div className={styles.nutritionInfo}>
+          <h3 className={styles.nutritionTitle}>Información Nutricional</h3>
+          {scrapedData.nutrition ? (
+            <>
+              <ul className={styles.nutritionList}>
+                <li>
+                  <span>Colesterol</span>
+                  <span>
+                    {scrapedData.nutrition.cholesterol ?? "N/A"} mg
+                  </span>
+                </li>
+                <li>
+                  <span>Grasas Saturadas</span>
+                  <span>
+                    {scrapedData.nutrition.fat_saturated ?? "N/A"} g
+                  </span>
+                </li>
+                <li>
+                  <span>Carbohidratos</span>
+                  <span>
+                    {scrapedData.nutrition.carbohydrates ?? "N/A"} g
+                  </span>
+                </li>
+                <li>
+                  <span>Fibra</span>
+                  <span>
+                    {scrapedData.nutrition.fiber ?? "N/A"} g
+                  </span>
+                </li>
+              </ul>
+              <p className={styles.nutritionSource}>
+                * {scrapedData.nutrition.source}
+              </p>
+            </>
+          ) : (
+            <p className={styles.nutritionNotAvailable}>
+              La información nutricional no está disponible para esta receta.
             </p>
-          </>
-        ) : (
-          <p className={styles.nutritionNotAvailable}>
-            La información nutricional no está disponible para esta receta.
-          </p>
-        )}
+          )}
+        </div>
       </div>
-    </div>
 
       <div className={styles.section}>
         <h2 className={styles.sectionTitle}>Modificar Receta con IA</h2>
