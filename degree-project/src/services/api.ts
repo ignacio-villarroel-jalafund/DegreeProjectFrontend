@@ -29,14 +29,14 @@ export interface RecipeSearchResult {
 }
 
 export interface NutritionInfo {
-  fat_total?: number | null;
-  fat_saturated?: number | null;
-  carbohydrates?: number | null;
-  fiber?: number | null;
-  sugar?: number | null;
-  sodium?: number | null;
-  potassium?: number | null;
-  cholesterol?: number | null;
+  fat_total_g?: number | null;
+  fat_saturated_g?: number | null;
+  carbohydrates_total_g?: number | null;
+  fiber_g?: number | null;
+  sugar_g?: number | null;
+  sodium_mg?: number | null;
+  potassium_mg?: number | null;
+  cholesterol_mg?: number | null;
   source: string;
 }
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../../pages/RecipeDisplayPage.module.css';
+import styles from './DirectionsList.module.css';
 
 interface DirectionsListProps {
   directions: string[];

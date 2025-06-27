@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrapedRecipeData } from '../../services/api';
-import styles from '../../pages/RecipeDisplayPage.module.css';
+import styles from './RecipeHeader.module.css';
 
 interface RecipeHeaderProps {
   recipe: ScrapedRecipeData;
@@ -21,10 +21,10 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({ recipe }) => {
           {recipe.nutrition ? (
             <>
               <ul className={styles.nutritionList}>
-                <li><span>Colesterol</span><span>{recipe.nutrition.cholesterol ?? "N/A"} mg</span></li>
-                <li><span>Grasas Saturadas</span><span>{recipe.nutrition.fat_saturated ?? "N/A"} g</span></li>
-                <li><span>Carbohidratos</span><span>{recipe.nutrition.carbohydrates ?? "N/A"} g</span></li>
-                <li><span>Fibra</span><span>{recipe.nutrition.fiber ?? "N/A"} g</span></li>
+                <li><span>Colesterol</span><span>{recipe.nutrition.cholesterol_mg ?? "N/A"} mg</span></li>
+                <li><span>Grasas Saturadas</span><span>{recipe.nutrition.fat_saturated_g ?? "N/A"} g</span></li>
+                <li><span>Carbohidratos</span><span>{recipe.nutrition.carbohydrates_total_g ?? "N/A"} g</span></li>
+                <li><span>Fibra</span><span>{recipe.nutrition.fiber_g ?? "N/A"} g</span></li>
               </ul>
               <p className={styles.nutritionSource}>* {recipe.nutrition.source}</p>
             </>

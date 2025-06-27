@@ -1,6 +1,5 @@
 import React from 'react';
-import styles from '../../pages/RecipeDisplayPage.module.css';
-// import { IngredientMenuState } from '../../hooks/useIngredientInteraction';
+import styles from './IngredientsList.module.css';
 
 interface IngredientsListProps {
   ingredients: string[];
