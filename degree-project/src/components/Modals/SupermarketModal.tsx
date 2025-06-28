@@ -28,6 +28,31 @@ const SupermarketModal: React.FC<SupermarketModalProps> = ({ modalState, onClose
 
   if (!modalState.isOpen) return null;
 
+  const renderOpeningHours = (hours: string[] | undefined | null) => {
+    if (!hours || hours.length === 0) {
+      return <p className={styles.supermarketDetail}>Horarios no disponibles.</p>;
+    }
+
+    return (
+      <div className={styles.supermarketDetail}>
+        <strong>Horarios de atención:</strong>
+        <ul className={styles.hoursList}>
+          {hours.map((line, index) => {
+            const parts = line.split(':');
+            const day = parts[0];
+            const time = parts.slice(1).join(':');
+            return (
+              <li key={index} className={styles.hoursListItem}>
+                <span className={styles.hoursDay}>{day}:</span>
+                <span className={styles.hoursTime}>{time}</span>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    );
+  };
+
   return (
     <div className={styles.supermarketModalOverlay} onClick={onClose}>
       <div ref={modalRef} className={styles.supermarketModal} onClick={(e) => e.stopPropagation()}>
@@ -45,8 +70,22 @@ const SupermarketModal: React.FC<SupermarketModalProps> = ({ modalState, onClose
                 className={styles.supermarketListItem}
               >
                 <div className={styles.supermarketHeader}><strong>{supermarket.name}</strong></div>
-                <p className={styles.supermarketAddress}>{supermarket.address}</p>
-                {/* Add more details as needed */}
+                <p className={styles.supermarketAddress}><strong>Ubicación:</strong> {supermarket.address}</p>
+                
+                {renderOpeningHours(supermarket.opening_hours_periods)}
+
+                <div className={styles.supermarketActions}>
+                  {supermarket.website && (
+                    <a href={supermarket.website} target="_blank" rel="noopener noreferrer" className={`${styles.modalButton}`}>
+                      Sitio Web
+                    </a>
+                  )}
+                  {supermarket.Maps_url && (
+                    <a href={supermarket.Maps_url} target="_blank" rel="noopener noreferrer" className={`${styles.modalButton}`}>
+                      Ver en Mapa
+                    </a>
+                  )}
+                </div>
               </li>
             ))}
             {modalState.isLoading && <li className={styles.loadingMoreListItem}><LoadingSpinner /></li>}
