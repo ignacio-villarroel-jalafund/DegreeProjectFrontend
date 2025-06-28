@@ -78,11 +78,9 @@ export const useRecipeDisplay = () => {
 
   const handleGoBack = () => navigate(-1);
 
-  const isLoading = isLoadingRecipe || isLoadingAdaptation || isPreviewLoading;
+  const isLoading = isLoadingRecipe || isLoadingAdaptation;
   const loadingMessage = isLoadingAdaptation
     ? 'La IA está cocinando tu petición...'
-    : isPreviewLoading
-    ? 'Buscando información...'
     : 'Cargando receta...';
 
   return {
@@ -106,6 +104,7 @@ export const useRecipeDisplay = () => {
     setIngredientMenu,
     setPreview,
     setSupermarketModal,
-    closeAllModals
+    closeAllModals,
+    isPreviewLoading,
   };
 };

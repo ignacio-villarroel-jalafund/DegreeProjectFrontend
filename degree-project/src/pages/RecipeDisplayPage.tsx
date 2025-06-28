@@ -34,6 +34,7 @@ const RecipeDisplayPage: React.FC = () => {
     setIngredientMenu,
     setPreview,
     setSupermarketModal,
+    isPreviewLoading,
   } = useRecipeDisplay();
 
   if (isLoading && !recipe) return <LoadingSpinner />;
@@ -60,7 +61,7 @@ const RecipeDisplayPage: React.FC = () => {
       {preview && (
         <IngredientPreviewModal 
             previewState={preview}
-            isLoading={false}
+            isLoading={isPreviewLoading}
             onClose={() => setPreview(null)}
         />
       )}

@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import styles from '../../pages/RecipeDisplayPage.module.css';
 import { IngredientPreviewState } from '../../hooks/useIngredientInteraction';
+import LoadingSpinner from '../UI/LoadingSpinner';
 
 interface IngredientPreviewModalProps {
   previewState: IngredientPreviewState;
@@ -25,7 +26,7 @@ const IngredientPreviewModal: React.FC<IngredientPreviewModalProps> = ({ preview
         <h3>{previewState.name}</h3>
         
         {isLoading ? (
-            <p>Buscando...</p>
+            <LoadingSpinner />
         ) : (
             <>
                 {previewState.found && previewState.imageUrl && (
