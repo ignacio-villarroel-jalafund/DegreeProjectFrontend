@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -28,14 +28,35 @@ export interface RecipeSearchResult {
   image_url: string;
 }
 
+export interface HistoryRead {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  recipe_data: ScrapedRecipeData;
+  source_url: string | null;
+  is_adapted: boolean;
+}
+
+export interface NutritionInfo {
+  fat_total_g?: number | null;
+  fat_saturated_g?: number | null;
+  carbohydrates_total_g?: number | null;
+  fiber_g?: number | null;
+  sugar_g?: number | null;
+  sodium_mg?: number | null;
+  potassium_mg?: number | null;
+  cholesterol_mg?: number | null;
+  source: string;
+}
+
 export interface ScrapedRecipeData {
   title?: string | null;
   servings?: number | null;
   ingredients?: string[] | null;
   directions?: string[] | null;
   url: string;
-  timing?: any | null;
   image_url?: string | null;
+  nutrition?: NutritionInfo | null;
 }
 
 export interface AnalyzeTaskResponse {
@@ -118,6 +139,12 @@ export const getIngredientInfoAPI = async (textQuery: string): Promise<Ingredien
   return response.data;
 };
 
+export const getUserHistoryAPI = async (): Promise<HistoryRead[]> => {
+  const response = await apiClient.get<HistoryRead[]>('/users/me/history');
+  console.log(response.data)
+  return response.data;
+};
+
 export interface SubdivisionData {
   country_queried: string;
   subdivisions: string[];
@@ -168,12 +195,33 @@ export const findSupermarketsAPI = async (
   return response.data;
 };
 
+export interface UserUpdateDetailsPayload {
+  username?: string;
+  email?: string;
+}
+
+export interface UserUpdatePasswordPayload {
+  current_password: string;
+  new_password: string;
+  confirm_password: string;
+}
+
+export const updateUserDetailsAPI = async (payload: UserUpdateDetailsPayload): Promise<User> => {
+  const response = await apiClient.put<User>('/users/me/details', payload);
+  return response.data;
+};
+
+export const updateUserPasswordAPI = async (payload: UserUpdatePasswordPayload): Promise<void> => {
+  await apiClient.put('/users/me/password', payload);
+};
+
 export interface User {
   id: string;
+  username: string;
   email: string;
   is_active: boolean;
-  created_at: string;
-  updated_at?: string | null;
+  created_at: Date;
+  updated_at?: Date | null;
 }
 
 export interface AuthToken {
@@ -183,9 +231,6 @@ export interface AuthToken {
 
 export interface Recipe {
     title: string;
-    prep_time?: number | null;
-    cook_time?: number | null;
-    total_time?: number | null;
     servings?: number | null;
     yield_amount?: string | null;
     ingredients: string;

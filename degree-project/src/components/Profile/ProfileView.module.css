@@ -1,0 +1,39 @@
+.profileDetails {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.2rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 600px) {
+  .profileDetails {
+    grid-template-columns: 170px 1fr;
+  }
+}
+
+.detailItem {
+  display: contents;
+}
+
+.detailLabel {
+  font-weight: 600;
+  color: #555;
+  text-align: left;
+  padding-right: 1rem;
+}
+
+@media (min-width: 600px) {
+  .detailLabel {
+    text-align: right;
+  }
+}
+
+.detailValue {
+  color: #222;
+  background-color: #f8f9fa;
+  padding: 0.6rem 1rem;
+  border-radius: 5px;
+  border: 1px solid #e9ecef;
+  word-break: break-all;
+  line-height: 1.5;
+}
