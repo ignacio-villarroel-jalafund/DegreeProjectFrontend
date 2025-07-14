@@ -1,5 +1,6 @@
 import React, { FormEvent } from 'react';
 import styles from './ProfileForms.module.css';
+import PasswordInput from '../UI/PasswordInput';
 
 interface ChangePasswordFormProps {
     formState: { currentPassword:string; newPassword: string; confirmPassword: string };
@@ -29,15 +30,38 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
             <form onSubmit={onSubmit} className={styles.profileForm}>
                 <div className={styles.formGroup}>
                     <label htmlFor="currentPassword" className={styles.formLabel}>Contraseña Actual:</label>
-                    <input type="password" id="currentPassword" value={formState.currentPassword} onChange={handleChange} className={styles.formInput} required disabled={isLoading} />
+                    <PasswordInput
+                        id="currentPassword"
+                        value={formState.currentPassword}
+                        onChange={handleChange}
+                        className={styles.formInput}
+                        required
+                        disabled={isLoading}
+                    />
                 </div>
                 <div className={styles.formGroup}>
                     <label htmlFor="newPassword" className={styles.formLabel}>Nueva Contraseña:</label>
-                    <input type="password" id="newPassword" value={formState.newPassword} onChange={handleChange} className={styles.formInput} minLength={8} required disabled={isLoading} />
+                    <PasswordInput
+                        id="newPassword"
+                        value={formState.newPassword}
+                        onChange={handleChange}
+                        className={styles.formInput}
+                        minLength={8}
+                        required
+                        disabled={isLoading}
+                    />
                 </div>
                 <div className={styles.formGroup}>
                     <label htmlFor="confirmPassword" className={styles.formLabel}>Confirmar Nueva Contraseña:</label>
-                    <input type="password" id="confirmPassword" value={formState.confirmPassword} onChange={handleChange} className={styles.formInput} minLength={8} required disabled={isLoading} />
+                    <PasswordInput
+                        id="confirmPassword"
+                        value={formState.confirmPassword}
+                        onChange={handleChange}
+                        className={styles.formInput}
+                        minLength={8}
+                        required
+                        disabled={isLoading}
+                    />
                 </div>
                 {error && <p className={styles.errorMessage}>{error}</p>}
                 <div className={styles.formActions}>

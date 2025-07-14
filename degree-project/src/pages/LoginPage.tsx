@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styles from './FormPage.module.css';
 import { useAuthForm } from '../hooks/useAuthForm';
+import PasswordInput from '../components/UI/PasswordInput';
 
 const LoginPage: React.FC = () => {
   const {
@@ -28,13 +29,13 @@ const LoginPage: React.FC = () => {
             onChange={handleChange}
             required
             disabled={isLoading}
+            className={styles.formInput}
           />
         </div>
         
         <div className={styles.formGroup}>
           <label htmlFor="password">Contraseña:</label>
-          <input
-            type="password"
+          <PasswordInput
             id="password"
             value={fields.password || ''}
             onChange={handleChange}

@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styles from './FormPage.module.css';
 import { useAuthForm } from '../hooks/useAuthForm';
+import PasswordInput from '../components/UI/PasswordInput';
 
 const RegisterPage: React.FC = () => {
   const {
@@ -27,6 +28,7 @@ const RegisterPage: React.FC = () => {
             onChange={handleChange}
             required
             disabled={isLoading}
+            className={styles.formInput}
           />
         </div>
         
@@ -39,13 +41,13 @@ const RegisterPage: React.FC = () => {
             onChange={handleChange}
             required
             disabled={isLoading}
+            className={styles.formInput}
           />
         </div>
         
         <div className={styles.formGroup}>
           <label htmlFor="password">Contraseña (mín. 8 caracteres):</label>
-          <input
-            type="password"
+          <PasswordInput
             id="password"
             value={fields.password || ''}
             onChange={handleChange}
@@ -57,8 +59,7 @@ const RegisterPage: React.FC = () => {
         
         <div className={styles.formGroup}>
           <label htmlFor="confirmPassword">Confirmar Contraseña:</label>
-          <input
-            type="password"
+          <PasswordInput
             id="confirmPassword"
             value={fields.confirmPassword || ''}
             onChange={handleChange}
