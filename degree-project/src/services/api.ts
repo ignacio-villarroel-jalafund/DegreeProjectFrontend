@@ -126,9 +126,9 @@ export interface RecipeAdaptationResponse {
   updated_recipe: ScrapedRecipeData;
 }
 
-export const searchRecipesAPI = async (query: string): Promise<RecipeSearchResult[]> => {
+export const searchRecipesAPI = async (query: string, skip: number = 0, limit: number = 10): Promise<RecipeSearchResult[]> => {
     const response = await apiClient.get<RecipeSearchResult[]>('/recipes/search', {
-        params: { query }
+        params: { query, skip, limit }
     });
     return response.data;
 };

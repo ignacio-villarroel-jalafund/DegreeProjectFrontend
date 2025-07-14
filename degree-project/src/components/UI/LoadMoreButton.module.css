@@ -1,0 +1,28 @@
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.loadMoreButton {
+  background-color: #FF0000;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.loadMoreButton:hover:not(:disabled) {
+  background-color: #CC0000;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+}
+
+.loadMoreButton:disabled {
+  background-color: #f9a0a0;
+  cursor: not-allowed;
+}

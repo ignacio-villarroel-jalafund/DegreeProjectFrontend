@@ -5,10 +5,11 @@ import { useHomePageLogic } from "../hooks/useHomePageLogic";
 import SearchSuggestionBar from "../components/HomePage/SearchSuggestionBar";
 import LocationDisplay from "../components/HomePage/LocationDisplay";
 import RecipeResultsGrid from "../components/Recipe/RecipeResultsGrid";
+import LoadMoreButton from "../components/UI/LoadMoreButton";
 
 const HomePage: React.FC = () => {
-  const { searchResults, isLoadingSearch, searchError } = useSearch();
-  const { pageTitle, activeButton, setActiveButton, locationHook } = useHomePageLogic();
+  const { searchResults, isLoadingSearch, searchError, hasMore, isLoadingMore } = useSearch();
+  const { pageTitle, activeButton, setActiveButton, locationHook, loadMore } = useHomePageLogic();
   const { locationInfo, isLoading: isLoadingLocation } = locationHook;
 
   const isLoading = isLoadingSearch || isLoadingLocation;
@@ -30,6 +31,11 @@ const HomePage: React.FC = () => {
         recipes={searchResults}
         isLoading={isLoading}
         error={searchError}
+      />
+      <LoadMoreButton
+        hasMore={hasMore}
+        isLoading={isLoadingMore}
+        onClick={loadMore}
       />
     </div>
   );

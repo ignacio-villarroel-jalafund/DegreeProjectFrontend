@@ -3,9 +3,10 @@ import { useSearchParams } from "react-router-dom";
 import { useSearch } from "../contexts/SearchContext";
 import RecipeResultsGrid from "../components/Recipe/RecipeResultsGrid";
 import styles from "./HomePage.module.css";
+import LoadMoreButton from "../components/UI/LoadMoreButton";
 
 const SearchResultsPage: React.FC = () => {
-  const { searchResults, isLoadingSearch, searchError, handleSearch } = useSearch();
+  const { searchResults, isLoadingSearch, searchError, handleSearch, hasMore, isLoadingMore } = useSearch();
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q");
 
@@ -18,7 +19,14 @@ const SearchResultsPage: React.FC = () => {
     } else {
       setPageTitle("No se especificó una búsqueda.");
     }
-  }, [query, handleSearch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
+
+  const loadMore = () => {
+    if (query) {
+      handleSearch(query, true);
+    }
+  };
 
   return (
     <div className={styles.homePageContainer}>
@@ -30,6 +38,11 @@ const SearchResultsPage: React.FC = () => {
         recipes={searchResults}
         isLoading={isLoadingSearch}
         error={searchError}
+      />
+      <LoadMoreButton
+        hasMore={hasMore}
+        isLoading={isLoadingMore}
+        onClick={loadMore}
       />
     </div>
   );

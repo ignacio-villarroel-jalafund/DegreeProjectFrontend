@@ -6,8 +6,10 @@ interface SearchContextType {
   isLoadingSearch: boolean;
   searchError: string | null;
   searchPerformed: boolean;
-  handleSearch: (query: string) => Promise<void>;
+  handleSearch: (query: string, loadMore?: boolean) => Promise<void>;
   clearSearch: () => void;
+  hasMore: boolean;
+  isLoadingMore: boolean;
 }
 
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
@@ -29,48 +31,56 @@ export const SearchProvider: React.FC<SearchProviderProps> = ({ children }) => {
   const [isLoadingSearch, setIsLoadingSearch] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [searchPerformed, setSearchPerformed] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  const handleSearch = useCallback(async (query: string) => {
-    console.log(`Searching for: ${query}`);
-    setIsLoadingSearch(true);
+  const handleSearch = useCallback(async (query: string, loadMore = false) => {
+    const pageToFetch = loadMore ? currentPage + 1 : 0;
+    if (loadMore) {
+      setIsLoadingMore(true);
+    } else {
+      setIsLoadingSearch(true);
+      setSearchResults(null);
+    }
     setSearchError(null);
-    setSearchResults(null);
     setSearchPerformed(true);
 
     try {
-      const results = await searchRecipesAPI(query);
-      console.log('Search results received:', results);
-      setSearchResults(results);
-
-      if (!results || results.length === 0) {
-          console.log('No recipes found for query:', query);
-      }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const results = await searchRecipesAPI(query, pageToFetch * 10, 10);
+      setSearchResults(prev => (loadMore && prev ? [...prev, ...results] : results));
+      setHasMore(results.length === 10);
+      setCurrentPage(pageToFetch);
     } catch (err: any) {
-      console.error("Error during search:", err);
       let errorMessage = "Error al realizar la búsqueda.";
       if (!navigator.onLine) {
-         errorMessage = "Error de búsqueda. Parece que estás offline.";
+        errorMessage = "Error de búsqueda. Parece que estás offline.";
       } else if (err.response) {
-          const detail = err.response.data?.detail;
-          errorMessage = `Error de búsqueda: ${detail || err.response.statusText || 'Error del servidor'}`;
-          if (err.response.status === 404) {
-              errorMessage = "No se encontraron recetas para esa búsqueda.";
-          }
+        const detail = err.response.data?.detail;
+        errorMessage = `Error de búsqueda: ${detail || err.response.statusText || 'Error del servidor'}`;
+        if (err.response.status === 404) {
+          errorMessage = "No se encontraron recetas para esa búsqueda.";
+        }
       }
       setSearchError(errorMessage);
-      setSearchResults([]);
+      if (!loadMore) {
+        setSearchResults([]);
+      }
     } finally {
-      setIsLoadingSearch(false);
+      if (loadMore) {
+        setIsLoadingMore(false);
+      } else {
+        setIsLoadingSearch(false);
+      }
     }
-  }, []);
+  }, [currentPage]);
 
   const clearSearch = useCallback(() => {
-      setSearchResults(null);
-      setSearchError(null);
-      setSearchPerformed(false);
-      console.log('Search cleared');
+    setSearchResults(null);
+    setSearchError(null);
+    setSearchPerformed(false);
+    setCurrentPage(0);
+    setHasMore(false);
   }, []);
 
   const value = {
@@ -80,6 +90,8 @@ export const SearchProvider: React.FC<SearchProviderProps> = ({ children }) => {
     searchPerformed,
     handleSearch,
     clearSearch,
+    hasMore,
+    isLoadingMore,
   };
 
   return <SearchContext.Provider value={value}>{children}</SearchContext.Provider>;

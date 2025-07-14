@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearch } from "../contexts/SearchContext";
 import { useLocation } from "./useLocation";
 
@@ -14,6 +14,13 @@ export const useHomePageLogic = () => {
   const [activeButton, setActiveButton] = useState<ActiveButtonType>(() => {
     return (sessionStorage.getItem(ACTIVE_BUTTON_STORAGE_KEY) as ActiveButtonType) || "local";
   });
+  const [currentQuery, setCurrentQuery] = useState("");
+
+  const executeSearch = useCallback((query: string, loadMore = false) => {
+    if (query) {
+      handleSearch(query, loadMore);
+    }
+  }, [handleSearch]);
 
   useEffect(() => {
     sessionStorage.setItem(ACTIVE_BUTTON_STORAGE_KEY, activeButton);
@@ -27,7 +34,7 @@ export const useHomePageLogic = () => {
     let title = "Recetas populares internacionalmente";
 
     if (locationError) {
-        setActiveButton("popular");
+      setActiveButton("popular");
     }
 
     switch (activeButton) {
@@ -36,7 +43,7 @@ export const useHomePageLogic = () => {
           query = `Recetas de ${locationInfo.city}`;
           title = `Recetas populares en ${locationInfo.city}`;
         } else {
-          setActiveButton("popular"); // Fallback
+          setActiveButton("popular");
         }
         break;
       case "nacional":
@@ -45,7 +52,7 @@ export const useHomePageLogic = () => {
           query = `Recetas de ${countryDisplay}`;
           title = `Recetas populares en ${countryDisplay}`;
         } else {
-          setActiveButton("popular"); // Fallback
+          setActiveButton("popular");
         }
         break;
       case "popular":
@@ -53,13 +60,22 @@ export const useHomePageLogic = () => {
     }
 
     setPageTitle(title);
-    handleSearch(query);
-  }, [activeButton, locationInfo, isLoadingLocation, locationError, handleSearch]);
+    setCurrentQuery(query);
+    executeSearch(query);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeButton, locationInfo, isLoadingLocation, locationError]);
+
+  const loadMore = () => {
+    if (currentQuery) {
+      executeSearch(currentQuery, true);
+    }
+  };
 
   return {
     pageTitle,
     activeButton,
     setActiveButton,
-    locationHook
+    locationHook,
+    loadMore,
   };
 };
