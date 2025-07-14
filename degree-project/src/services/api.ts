@@ -22,6 +22,21 @@ apiClient.interceptors.request.use(
   }
 );
 
+export interface FavoriteBase {
+  recipe_id: string;
+}
+
+export interface FavoriteRecipeCreate {
+  recipe_data: ScrapedRecipeData;
+  is_adapted: boolean;
+}
+
+export interface FavoriteRead extends FavoriteBase {
+  id: string;
+  user_id: string;
+  created_at: string;
+}
+
 export interface RecipeSearchResult {
   title: string;
   url: string;
@@ -57,6 +72,21 @@ export interface ScrapedRecipeData {
   url: string;
   image_url?: string | null;
   nutrition?: NutritionInfo | null;
+}
+
+export interface RecipeRead {
+    id: string;
+    recipe_name: string;
+    servings?: number | null;
+    ingredients: string;
+    directions: string;
+    rating?: number | null;
+    url: string;
+    cuisine_path?: string | null;
+    nutrition?: string | null;
+    img_src?: string | null;
+    created_at: string;
+    updated_at?: string | null;
 }
 
 export interface AnalyzeTaskResponse {
@@ -104,7 +134,9 @@ export const searchRecipesAPI = async (query: string): Promise<RecipeSearchResul
 };
 
 export const scrapeRecipeAPI = async (url: string): Promise<ScrapedRecipeData> => {
-    const response = await apiClient.post<ScrapedRecipeData>('/recipes/scrape', { url });
+    const response = await apiClient.get<ScrapedRecipeData>('/recipes/scrape', {
+        params: { url }
+    });
     response.data.ingredients = response.data.ingredients ?? [];
     response.data.directions = response.data.directions ?? [];
     return response.data;
@@ -156,6 +188,20 @@ export const getSubdivisionsAPI = async (country: string, lang: string = 'es'): 
     params: { country, lang }
   });
   return response.data;
+};
+
+export const getFavoritesAPI = async (): Promise<RecipeRead[]> => {
+  const response = await apiClient.get<RecipeRead[]>('/users/me/favorites');
+  return response.data;
+};
+
+export const addFavoriteAPI = async (favoriteData: FavoriteRecipeCreate): Promise<FavoriteRead> => {
+  const response = await apiClient.post<FavoriteRead>('/users/me/favorites', favoriteData);
+  return response.data;
+};
+
+export const removeFavoriteAPI = async (recipeId: string): Promise<void> => {
+  await apiClient.delete(`/users/me/favorites/${recipeId}`);
 };
 
 export interface SupermarketInfo {

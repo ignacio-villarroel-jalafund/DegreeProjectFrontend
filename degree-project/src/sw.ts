@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
 import { NavigationRoute, registerRoute } from 'workbox-routing';
-import { NetworkOnly, NetworkFirst, CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
+import { NetworkOnly, StaleWhileRevalidate, CacheFirst } from 'workbox-strategies';
 import { ExpirationPlugin } from 'workbox-expiration';
 
 declare let self: ServiceWorkerGlobalScope;
@@ -21,7 +21,7 @@ registerRoute(
     request.method === 'GET' &&
     url.origin === API_BASE.origin &&
     url.pathname === `${API_BASE.pathname}/users/me`,
-  new NetworkFirst({
+  new StaleWhileRevalidate({
     cacheName: 'user-data-cache',
     plugins: [
       new ExpirationPlugin({
@@ -37,7 +37,7 @@ registerRoute(
     request.method === 'GET' &&
     url.origin === API_BASE.origin &&
     url.pathname === `${API_BASE.pathname}/users/me/history`,
-  new NetworkFirst({
+  new StaleWhileRevalidate({
     cacheName: 'user-history-cache',
     plugins: [
       new ExpirationPlugin({
@@ -69,7 +69,7 @@ registerRoute(
     request.method === 'GET' &&
     url.origin === API_BASE.origin &&
     url.pathname === `${API_BASE.pathname}/locations/subdivisions`,
-  new NetworkFirst({
+  new StaleWhileRevalidate({
     cacheName: 'api-subdivisions-cache',
     plugins: [
       new ExpirationPlugin({
@@ -85,7 +85,7 @@ registerRoute(
     request.method === 'GET' &&
     url.origin === API_BASE.origin &&
     url.pathname.startsWith(`${API_BASE.pathname}/tasks/`),
-  new NetworkFirst({
+  new StaleWhileRevalidate({
     cacheName: 'api-tasks-cache',
     plugins: [
       new ExpirationPlugin({
@@ -111,10 +111,10 @@ registerRoute(
 
 registerRoute(
   ({ url, request }) =>
-    request.method === 'POST' &&
+    request.method === 'GET' &&
     url.origin === API_BASE.origin &&
     url.pathname === `${API_BASE.pathname}/recipes/scrape`,
-  new NetworkFirst({
+  new StaleWhileRevalidate({
     cacheName: 'scraped-recipes-cache',
     plugins: [
       new ExpirationPlugin({
@@ -122,8 +122,7 @@ registerRoute(
         maxAgeSeconds: 7 * 24 * 60 * 60,
       }),
     ],
-  }),
-  'POST'
+  })
 );
 
 registerRoute(

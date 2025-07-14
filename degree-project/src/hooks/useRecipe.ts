@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ScrapedRecipeData } from '../services/api';
-import { recipeService, cacheService } from '../services/recipe.service';
+import { recipeService } from '../services/recipe.service';
 
 export const useRecipe = (recipeUrl: string | null) => {
   const [recipe, setRecipe] = useState<ScrapedRecipeData | null>(null);
@@ -11,20 +11,10 @@ export const useRecipe = (recipeUrl: string | null) => {
   const fetchRecipe = useCallback(async (url: string) => {
     setIsLoading(true);
     setError(null);
-
-    const cachedEntry = cacheService.get(url);
-    if (cachedEntry) {
-      setRecipe(cachedEntry.recipe);
-      setIsAdapted(cachedEntry.isAdapted);
-      setIsLoading(false);
-      return;
-    }
-
     try {
       const data = await recipeService.scrapeRecipe(url);
       setRecipe(data);
       setIsAdapted(false);
-      cacheService.set(url, data, false);
     } catch (err: any) {
       const errorMsg = err.response?.data?.detail || "Error al obtener los datos de la receta.";
       setError(errorMsg);
@@ -41,14 +31,11 @@ export const useRecipe = (recipeUrl: string | null) => {
       setIsLoading(false);
     }
   }, [recipeUrl, fetchRecipe]);
-  
+
   const updateRecipeData = useCallback((newRecipe: ScrapedRecipeData, adapted: boolean) => {
-      if(recipeUrl){
-        setRecipe(newRecipe);
-        setIsAdapted(adapted);
-        cacheService.set(recipeUrl, newRecipe, adapted);
-      }
-  }, [recipeUrl]);
+      setRecipe(newRecipe);
+      setIsAdapted(adapted);
+  }, []);
 
   return { recipe, isAdapted, isLoading, error, updateRecipeData };
 };
