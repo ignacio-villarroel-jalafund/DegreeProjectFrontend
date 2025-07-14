@@ -4,15 +4,18 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App.tsx';
 import { AuthProvider } from './contexts/AuthContext.tsx';
 import { SearchProvider } from './contexts/SearchContext.tsx';
+import { FavoritesProvider } from './contexts/FavoriteContext.tsx';
 import './styles/index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <SearchProvider>
-            <App />
-        </SearchProvider>
+        <FavoritesProvider>
+          <SearchProvider>
+              <App />
+          </SearchProvider>
+        </FavoritesProvider>
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>,

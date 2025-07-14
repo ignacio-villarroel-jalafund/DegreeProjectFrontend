@@ -40,7 +40,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           &times;
         </button>
         {isAuthenticated && user && (
-          <div className={styles.userName}>Hola, {user.email}</div>
+          <div className={styles.userName}>Hola, {user.username}</div>
         )}
         {isAuthenticated ? (
           <>
@@ -49,6 +49,12 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
               className={styles.menuItem}
             >
               Perfil
+            </button>
+             <button
+              onClick={() => handleNavigate("/favorites")}
+              className={styles.menuItem}
+            >
+              Mis Favoritos
             </button>
             <button
               onClick={() => handleNavigate("/history")}

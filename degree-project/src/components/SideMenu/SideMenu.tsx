@@ -22,6 +22,9 @@ const SideMenu: React.FC<SideMenuProps> = ({ onLogout, onClose }) => {
       <Link to="/profile" className={styles.menuItem} onClick={handleLinkClick}>
         Perfil
       </Link>
+      <Link to="/favorites" className={styles.menuItem} onClick={handleLinkClick}>
+        Mis Favoritos
+      </Link>
       <Link to="/history" className={styles.menuItem} onClick={handleLinkClick}>
         Historial
       </Link>

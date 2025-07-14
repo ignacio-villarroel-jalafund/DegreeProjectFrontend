@@ -12,6 +12,7 @@ import SearchResultsPage from '../pages/SearchResultsPage';
 import ProfilePage from '../pages/ProfilePage';
 import ProtectedRoute from './ProtectedRoute';
 import HistoryPage from '../pages/HistoryPage';
+import FavoritesPage from '../pages/FavoritesPage';
 
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { isAuthenticated, isLoading } = useAuth();
@@ -42,6 +43,7 @@ const AppRoutes: React.FC = () => {
         <Route element={<ProtectedRoute />}>
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/history" element={<HistoryPage />} />
+          <Route path="/favorites" element={<FavoritesPage />} />
         </Route>
 
         <Route path="*" element={

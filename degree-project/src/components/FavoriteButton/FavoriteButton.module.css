@@ -1,0 +1,55 @@
+.favoriteButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.8rem;
+  color: #ff0000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  position: relative;
+}
+
+.favoriteButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.favoriteButton svg {
+  transition: transform 0.2s ease-in-out;
+}
+
+.favoriteButton:hover:not(:disabled) svg {
+  transform: scale(1.15);
+}
+
+.tooltip {
+  position: relative;
+  cursor: pointer;
+}
+
+.tooltip::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  
+  background-color: #333;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  z-index: 10;
+}
+
+.tooltip:hover::before {
+  opacity: 1;
+  visibility: visible;
+}
