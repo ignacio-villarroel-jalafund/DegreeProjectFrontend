@@ -1,5 +1,6 @@
 import React from "react";
 import { useRecipeDisplay } from "../hooks/useRecipeDisplay";
+import { useConfirmation } from "../hooks/useConfirmation";
 
 import LoadingSpinner from "../components/UI/LoadingSpinner";
 import RecipeHeader from "../components/Recipe/RecipeHeader";
@@ -38,6 +39,8 @@ const RecipeDisplayPage: React.FC = () => {
     isPreviewLoading,
   } = useRecipeDisplay();
 
+  const { showConfirmation } = useConfirmation();
+
   if (isLoading && !recipe) return <LoadingSpinner />;
   if (recipeError || !recipe)
     return (
@@ -45,6 +48,11 @@ const RecipeDisplayPage: React.FC = () => {
         Error: {recipeError || "No se pudo cargar la receta."}
       </p>
     );
+
+  const handleExternalLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, url: string) => {
+    e.preventDefault();
+    showConfirmation(url, 'Estás a punto de ver la receta en su sitio original. ¿Deseas continuar?');
+  };
 
   return (
     <div className={styles.displayPage}>
@@ -115,8 +123,7 @@ const RecipeDisplayPage: React.FC = () => {
             Fuente:{" "}
             <a
               href={recipe.url}
-              target="_blank"
-              rel="noopener noreferrer"
+              onClick={(e) => handleExternalLinkClick(e, recipe.url!)}
               className={styles.link}
             >
               Ver receta original

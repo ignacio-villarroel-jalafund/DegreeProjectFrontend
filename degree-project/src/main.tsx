@@ -5,6 +5,7 @@ import App from './App.tsx';
 import { AuthProvider } from './contexts/AuthContext.tsx';
 import { SearchProvider } from './contexts/SearchContext.tsx';
 import { FavoritesProvider } from './contexts/FavoriteContext.tsx';
+import { ConfirmationProvider } from './contexts/ConfirmationContext.tsx';
 import './styles/index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -13,7 +14,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <AuthProvider>
         <FavoritesProvider>
           <SearchProvider>
+            <ConfirmationProvider>
               <App />
+            </ConfirmationProvider>
           </SearchProvider>
         </FavoritesProvider>
       </AuthProvider>

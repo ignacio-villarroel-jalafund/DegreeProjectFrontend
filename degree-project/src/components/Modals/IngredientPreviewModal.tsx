@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import styles from '../../pages/RecipeDisplayPage.module.css';
 import { IngredientPreviewState } from '../../hooks/useIngredientInteraction';
 import LoadingSpinner from '../UI/LoadingSpinner';
+import { useConfirmation } from '../../hooks/useConfirmation';
 
 interface IngredientPreviewModalProps {
   previewState: IngredientPreviewState;
@@ -11,12 +12,20 @@ interface IngredientPreviewModalProps {
 
 const IngredientPreviewModal: React.FC<IngredientPreviewModalProps> = ({ previewState, isLoading, onClose }) => {
   const modalRef = useRef<HTMLDivElement>(null);
+  const { showConfirmation } = useConfirmation();
 
   if (!previewState) return null;
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
       onClose();
+    }
+  };
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (previewState.searchUrl) {
+      showConfirmation(previewState.searchUrl, `Estás a punto de buscar "${previewState.name}" en la web. ¿Deseas continuar?`);
     }
   };
 
@@ -40,9 +49,9 @@ const IngredientPreviewModal: React.FC<IngredientPreviewModalProps> = ({ preview
                 )}
 
                 {previewState.found && previewState.searchUrl && (
-                    <a href={previewState.searchUrl} target="_blank" rel="noopener noreferrer" className={`${styles.previewLinkButton} ${styles.modalButton}`}>
+                    <button onClick={handleLinkClick} className={`${styles.previewLinkButton} ${styles.modalButton}`}>
                         Ver más información
-                    </a>
+                    </button>
                 )}
             </>
         )}

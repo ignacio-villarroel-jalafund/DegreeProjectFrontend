@@ -2,6 +2,7 @@ import React, { useRef, useCallback } from 'react';
 import styles from '../../pages/RecipeDisplayPage.module.css';
 import { SupermarketModalState } from '../../hooks/useIngredientInteraction';
 import LoadingSpinner from '../UI/LoadingSpinner';
+import { useConfirmation } from '../../hooks/useConfirmation';
 
 interface SupermarketModalProps {
   modalState: SupermarketModalState;
@@ -12,6 +13,7 @@ interface SupermarketModalProps {
 const SupermarketModal: React.FC<SupermarketModalProps> = ({ modalState, onClose, onLoadMore }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const observer = useRef<IntersectionObserver>(null);
+  const { showConfirmation } = useConfirmation();
 
   const lastSupermarketElementRef = useCallback((node: HTMLLIElement | null) => {
     if (modalState.isLoading) return;
@@ -27,6 +29,14 @@ const SupermarketModal: React.FC<SupermarketModalProps> = ({ modalState, onClose
   }, [modalState.isLoading, modalState.nextPageToken, onLoadMore]);
 
   if (!modalState.isOpen) return null;
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLButtonElement>, url: string, name: string) => {
+    e.preventDefault();
+    const message = e.currentTarget.textContent?.toLowerCase().includes('mapa')
+      ? `Se abrirá Google Maps para mostrar la ubicación de "${name}". ¿Continuar?`
+      : `Estás por visitar el sitio web de "${name}". ¿Continuar?`;
+    showConfirmation(url, message);
+  };
 
   const renderOpeningHours = (hours: string[] | undefined | null) => {
     if (!hours || hours.length === 0) {
@@ -76,14 +86,14 @@ const SupermarketModal: React.FC<SupermarketModalProps> = ({ modalState, onClose
 
                 <div className={styles.supermarketActions}>
                   {supermarket.website && (
-                    <a href={supermarket.website} target="_blank" rel="noopener noreferrer" className={`${styles.modalButton}`}>
+                    <button onClick={(e) => handleLinkClick(e, supermarket.website!, supermarket.name)} className={`${styles.modalButton}`}>
                       Sitio Web
-                    </a>
+                    </button>
                   )}
                   {supermarket.Maps_url && (
-                    <a href={supermarket.Maps_url} target="_blank" rel="noopener noreferrer" className={`${styles.modalButton}`}>
+                    <button onClick={(e) => handleLinkClick(e, supermarket.Maps_url!, supermarket.name)} className={`${styles.modalButton}`}>
                       Ver en Mapa
-                    </a>
+                    </button>
                   )}
                 </div>
               </li>
