@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { AnalysisType, ScrapedRecipeData } from '../../services/api';
+import React, { useState, useEffect } from 'react';
+import { AnalysisType, ScrapedRecipeData, Diet, Allergy, getAllergiesAPI, getDietsAPI } from '../../services/api';
 import styles from '../../pages/RecipeDisplayPage.module.css';
+import { FiChevronDown } from 'react-icons/fi';
 
 interface RecipeActionsProps {
   recipe: ScrapedRecipeData;
@@ -13,11 +14,30 @@ interface RecipeActionsProps {
 const RecipeActions: React.FC<RecipeActionsProps> = ({ recipe, adaptRecipe, isLoading, error, isAdapted }) => {
   const [scalingValue, setScalingValue] = useState(String(recipe.servings || 1));
   const [isScaling, setIsScaling] = useState(false);
-  
-  const handleAdaptDiet = (diet: "vegana" | "sin gluten" | "sin lactosa") => {
-    adaptRecipe("ADAPT_DIET", { diet });
+  const [diets, setDiets] = useState<Diet[]>([]);
+  const [allergies, setAllergies] = useState<Allergy[]>([]);
+
+  useEffect(() => {
+    const fetchOptions = async () => {
+      try {
+        const [dietsData, allergiesData] = await Promise.all([getDietsAPI(), getAllergiesAPI()]);
+        setDiets(dietsData);
+        setAllergies(allergiesData);
+      } catch (error) {
+        console.error("Error fetching adaptation options:", error);
+      }
+    };
+    fetchOptions();
+  }, []);
+
+  const handleAdaptationChange = (type: "diet" | "allergy", event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    if (value) {
+      adaptRecipe("ADAPT_DIET", { [type]: value });
+      event.target.value = "";
+    }
   };
-  
+
   const handleScaleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       const newServings = parseInt(scalingValue, 10);
@@ -33,12 +53,41 @@ const RecipeActions: React.FC<RecipeActionsProps> = ({ recipe, adaptRecipe, isLo
       {error && <p className={styles.error}>{error}</p>}
       {isAdapted && !error && !isLoading && <p className={styles.successText}>¡Receta adaptada exitosamente!</p>}
 
-      <div className={styles.toolsGroup}>
-        <h3 className={styles.toolsGroupTitle}>Adaptar a una Dieta</h3>
-        <div className={styles.toolsGrid}>
-          <button onClick={() => handleAdaptDiet("vegana")} disabled={isLoading} className={styles.toolButton}>Hacer Vegana</button>
-          <button onClick={() => handleAdaptDiet("sin gluten")} disabled={isLoading} className={styles.toolButton}>Sin Gluten</button>
-          <button onClick={() => handleAdaptDiet("sin lactosa")} disabled={isLoading} className={styles.toolButton}>Sin Lactosa</button>
+      <div className={styles.adaptationGrid}>
+        <div className={styles.toolsGroup}>
+          <h3 className={styles.toolsGroupTitle}>Adaptar a una Dieta</h3>
+          <div className={styles.selectWrapper}>
+            <select
+              onChange={(e) => handleAdaptationChange("diet", e)}
+              disabled={isLoading || diets.length === 0}
+              className={styles.adaptationSelect}
+              defaultValue=""
+            >
+              <option value="" disabled>Selecciona una dieta...</option>
+              {diets.map(diet => (
+                <option key={diet.id} value={diet.name}>{diet.name}</option>
+              ))}
+            </select>
+            <FiChevronDown className={styles.selectArrowIcon} />
+          </div>
+        </div>
+
+        <div className={styles.toolsGroup}>
+          <h3 className={styles.toolsGroupTitle}>Evitar Alérgenos</h3>
+          <div className={styles.selectWrapper}>
+            <select
+              onChange={(e) => handleAdaptationChange("allergy", e)}
+              disabled={isLoading || allergies.length === 0}
+              className={styles.adaptationSelect}
+              defaultValue=""
+            >
+              <option value="" disabled>Selecciona un alérgeno...</option>
+              {allergies.map(allergy => (
+                <option key={allergy.id} value={allergy.name}>{allergy.name}</option>
+              ))}
+            </select>
+            <FiChevronDown className={styles.selectArrowIcon} />
+          </div>
         </div>
       </div>
 

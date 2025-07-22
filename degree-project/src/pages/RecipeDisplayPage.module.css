@@ -928,3 +928,70 @@ body {
     padding: 1.2rem;
   }
 }
+
+.adaptationGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.selectWrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.adaptationSelect {
+  appearance: none;
+  background-color: #f8f9fa;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  padding: 0.8rem 2.5rem 0.8rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  width: 100%;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.adaptationSelect:disabled {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.adaptationSelect:hover:not(:disabled) {
+  border-color: var(--primary-color);
+}
+
+.selectArrowIcon {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  color: var(--primary-color);
+  font-size: 1.5rem;
+  pointer-events: none;
+}
+
+.toolsGroup .toolButton {
+  background: linear-gradient(45deg, var(--primary-color), var(--primary-hover));
+  color: white;
+  border: none;
+  padding: 0.75rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 3px 8px rgba(255, 0, 0, 0.2);
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .adaptationGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}

@@ -96,7 +96,6 @@ export interface AnalyzeTaskResponse {
 export interface TaskResult {
   status?: string;
   analysis?: string | null;
-  message?: string | null;
   recipe_id?: string | null;
   error?: string;
   exc_type?: string;
@@ -125,6 +124,29 @@ export interface RecipeAdaptationResponse {
   summary: string;
   updated_recipe: ScrapedRecipeData;
 }
+
+export interface Diet {
+  id: string;
+  name: string;
+  description: string | null;
+}
+
+export interface Allergy {
+  id: string;
+  name: string;
+  description: string | null;
+}
+
+export const getAllergiesAPI = async (): Promise<Allergy[]> => {
+    const response = await apiClient.get<Allergy[]>('/allergies/');
+    return response.data;
+};
+
+export const getDietsAPI = async (): Promise<Diet[]> => {
+    const response = await apiClient.get<Diet[]>('/diets/');
+    return response.data;
+};
+
 
 export const searchRecipesAPI = async (query: string, skip: number = 0, limit: number = 10): Promise<RecipeSearchResult[]> => {
     const response = await apiClient.get<RecipeSearchResult[]>('/recipes/search', {
