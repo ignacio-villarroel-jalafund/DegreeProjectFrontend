@@ -4,21 +4,16 @@ import { IngredientMenuState } from '../../hooks/useIngredientInteraction';
 
 interface IngredientContextMenuProps {
   menuState: IngredientMenuState;
-  // CORRECCIÓN: Se permite que la ref pueda ser null.
   menuRef: React.RefObject<HTMLDivElement | null>;
   onSearchOnline: (ingredient: string) => void;
-  onFindSupermarkets: (ingredient: string) => void;
   onClose: () => void;
-  isLoadingLocation: boolean;
 }
 
 const IngredientContextMenu: React.FC<IngredientContextMenuProps> = ({
   menuState,
   menuRef,
   onSearchOnline,
-  onFindSupermarkets,
   onClose,
-  isLoadingLocation
 }) => {
   if (!menuState) return null;
 
@@ -39,13 +34,6 @@ const IngredientContextMenu: React.FC<IngredientContextMenuProps> = ({
       </div>
       <button onClick={() => onSearchOnline(menuState.name)} className={styles.menuButton}>
         Buscar ingrediente en línea
-      </button>
-      <button
-        onClick={() => onFindSupermarkets(menuState.name)}
-        className={styles.menuButton}
-        disabled={isLoadingLocation}
-      >
-        {isLoadingLocation ? 'Cargando ubicación...' : 'Buscar supermercados locales'}
       </button>
       <button onClick={onClose} className={`${styles.menuButton} ${styles.menuButtonCancel}`}>
         Cerrar Menú

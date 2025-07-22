@@ -59,9 +59,7 @@ const RecipeDisplayPage: React.FC = () => {
         menuState={ingredientMenu}
         menuRef={menuRef}
         onSearchOnline={handleSearchOnline}
-        onFindSupermarkets={handleFindSupermarkets}
         onClose={() => setIngredientMenu(null)}
-        isLoadingLocation={isLoadingLocation}
       />
 
       {preview && (
@@ -101,7 +99,9 @@ const RecipeDisplayPage: React.FC = () => {
         ingredients={recipe.ingredients || []}
         isAdapted={isAdapted}
         onIngredientClick={handleIngredientClick}
+        onFindSupermarketsClick={handleFindSupermarkets}
         isLoading={isLoading}
+        isLoadingLocation={isLoadingLocation}
       />
 
       <DirectionsList

@@ -5,7 +5,7 @@ import { SupermarketInfo as SupermarketInfoType } from '../services/api';
 
 export type IngredientMenuState = { index: number; name: string; x: number; y: number } | null;
 export type IngredientPreviewState = { name: string; imageUrl: string | null; searchUrl: string | null; found: boolean; message?: string } | null;
-export type SupermarketModalState = { isOpen: boolean; ingredientName: string | null; results: SupermarketInfoType[] | null; isLoading: boolean; error: string | null; nextPageToken: string | null; };
+export type SupermarketModalState = { isOpen: boolean; results: SupermarketInfoType[] | null; isLoading: boolean; error: string | null; nextPageToken: string | null; };
 
 export const useIngredientInteraction = () => {
     const { locationInfo, isLoading: isLoadingLocation, error: locationError } = useLocation();
@@ -13,7 +13,7 @@ export const useIngredientInteraction = () => {
     const [ingredientMenu, setIngredientMenu] = useState<IngredientMenuState>(null);
     const [preview, setPreview] = useState<IngredientPreviewState>(null);
     const [isPreviewLoading, setIsPreviewLoading] = useState(false);
-    const [supermarketModal, setSupermarketModal] = useState<SupermarketModalState>({ isOpen: false, ingredientName: null, results: null, isLoading: false, error: null, nextPageToken: null });
+    const [supermarketModal, setSupermarketModal] = useState<SupermarketModalState>({ isOpen: false, results: null, isLoading: false, error: null, nextPageToken: null });
 
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -35,15 +35,15 @@ export const useIngredientInteraction = () => {
         }
     }, []);
 
-    const handleFindSupermarkets = useCallback(async (ingredientName: string) => {
+    const handleFindSupermarkets = useCallback(async () => {
         setIngredientMenu(null);
         if (isLoadingLocation) return;
         if (locationError || !locationInfo) {
-            setSupermarketModal({ isOpen: true, ingredientName, results: null, isLoading: false, error: `No se pudo obtener tu ubicación: ${locationError || 'Revisa permisos.'}`, nextPageToken: null });
+            setSupermarketModal({ isOpen: true, results: null, isLoading: false, error: `No se pudo obtener tu ubicación: ${locationError || 'Revisa permisos.'}`, nextPageToken: null });
             return;
         }
 
-        setSupermarketModal({ isOpen: true, ingredientName, results: [], isLoading: true, error: null, nextPageToken: null });
+        setSupermarketModal({ isOpen: true, results: [], isLoading: true, error: null, nextPageToken: null });
         try {
             const data = await recipeService.findSupermarkets(locationInfo.city, locationInfo.countryFullName);
             setSupermarketModal(prev => ({ ...prev, isLoading: false, results: data.supermarkets, nextPageToken: data.next_page_token || null, error: data.supermarkets.length === 0 ? "No se encontraron supermercados." : null }));
