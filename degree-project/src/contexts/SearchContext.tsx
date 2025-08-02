@@ -42,6 +42,7 @@ export const SearchProvider: React.FC<SearchProviderProps> = ({ children }) => {
     } else {
       setIsLoadingSearch(true);
       setSearchResults(null);
+      setHasMore(false);
     }
     setSearchError(null);
     setSearchPerformed(true);
