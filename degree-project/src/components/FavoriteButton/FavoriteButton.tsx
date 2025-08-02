@@ -18,8 +18,8 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({ recipe, isAdapted }) =>
 
   if (!isAuthenticated) {
     return (
-      <button 
-        onClick={() => navigate('/login')} 
+      <button
+        onClick={() => navigate('/login')}
         className={`${styles.favoriteButton} ${styles.tooltip}`}
         data-tooltip="Inicia sesión para guardar"
       >
@@ -28,23 +28,24 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({ recipe, isAdapted }) =>
     );
   }
 
+  const favoriteStatus = isFavorite(recipe);
+
   const handleToggleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
 
-    const favoriteStatus = isFavorite(recipe);
     if (favoriteStatus.isFavorite) {
-      removeFavorite(favoriteStatus.recipeId!);
+      if (favoriteStatus.recipeId) {
+        removeFavorite(favoriteStatus.recipeId);
+      }
     } else {
       addFavorite(recipe, isAdapted);
     }
   };
 
-  const { isFavorite: isFav } = isFavorite(recipe);
-
   return (
     <button onClick={handleToggleFavorite} disabled={isLoading} className={styles.favoriteButton}>
-      {isFav ? <FaHeart color="red" /> : <FaRegHeart />}
+      {favoriteStatus.isFavorite ? <FaHeart color="red" /> : <FaRegHeart />}
     </button>
   );
 };

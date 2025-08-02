@@ -48,10 +48,11 @@ export const FavoritesProvider: React.FC<FavoritesProviderProps> = ({ children }
 
   const isFavorite = useCallback((recipe: ScrapedRecipeData): { isFavorite: boolean, recipeId: string | null } => {
     const found = favorites.find(fav => fav.url === recipe.url);
-    return {
+    const result = {
       isFavorite: !!found,
       recipeId: found ? found.id : null
     };
+    return result;
   }, [favorites]);
 
   const addFavorite = async (recipeData: ScrapedRecipeData, isAdapted: boolean) => {
@@ -59,7 +60,7 @@ export const FavoritesProvider: React.FC<FavoritesProviderProps> = ({ children }
     setError(null);
     try {
       await addFavoriteAPI({ recipe_data: recipeData, is_adapted: isAdapted });
-      await fetchFavorites(); // Re-fetch all favorites to get the new one with its ID
+      await fetchFavorites();
     } catch (err) {
       setError("No se pudo añadir a favoritos.");
     } finally {
@@ -68,11 +69,16 @@ export const FavoritesProvider: React.FC<FavoritesProviderProps> = ({ children }
   };
 
   const removeFavorite = async (recipeId: string) => {
+    if (!recipeId) {
+      setError("No se pudo identificar la receta para eliminar.");
+      return;
+    }
+    
     setIsLoading(true);
     setError(null);
     try {
       await removeFavoriteAPI(recipeId);
-      setFavorites(prev => prev.filter(fav => fav.id !== recipeId));
+      await fetchFavorites();
     } catch (err) {
       setError("No se pudo eliminar de favoritos.");
     } finally {
