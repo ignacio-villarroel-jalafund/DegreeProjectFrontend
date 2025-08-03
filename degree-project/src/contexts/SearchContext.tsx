@@ -53,18 +53,20 @@ export const SearchProvider: React.FC<SearchProviderProps> = ({ children }) => {
       setHasMore(results.length === 10);
       setCurrentPage(pageToFetch);
     } catch (err: any) {
-      let errorMessage = "Error al realizar la búsqueda.";
-      if (!navigator.onLine) {
-        errorMessage = "Error de búsqueda. Parece que estás offline.";
-      } else if (err.response) {
-        const detail = err.response.data?.detail;
-        errorMessage = `Error de búsqueda: ${detail || err.response.statusText || 'Error del servidor'}`;
-        if (err.response.status === 404) {
-          errorMessage = "No se encontraron recetas para esa búsqueda.";
+      if (loadMore) {
+        setHasMore(false);
+      } else {
+        let errorMessage = "Error al realizar la búsqueda.";
+        if (!navigator.onLine) {
+          errorMessage = "Error de búsqueda. Parece que estás offline.";
+        } else if (err.response) {
+          const detail = err.response.data?.detail;
+          errorMessage = `Error de búsqueda: ${detail || err.response.statusText || 'Error del servidor'}`;
+          if (err.response.status === 404) {
+            errorMessage = "No se encontraron recetas para esa búsqueda.";
+          }
         }
-      }
-      setSearchError(errorMessage);
-      if (!loadMore) {
+        setSearchError(errorMessage);
         setSearchResults([]);
       }
     } finally {
