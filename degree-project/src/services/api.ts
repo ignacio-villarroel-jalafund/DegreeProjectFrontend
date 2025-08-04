@@ -137,6 +137,21 @@ export interface Allergy {
   description: string | null;
 }
 
+export interface RecipeRead {
+    id: string;
+    recipe_name: string;
+    servings?: number | null;
+    ingredients: string;
+    directions: string;
+    rating?: number | null;
+    url: string;
+    cuisine_path?: string | null;
+    nutrition?: string | null;
+    img_src?: string | null;
+    created_at: string;
+    updated_at?: string | null;
+}
+
 export const getAllergiesAPI = async (): Promise<Allergy[]> => {
     const response = await apiClient.get<Allergy[]>('/allergies/');
     return response.data;

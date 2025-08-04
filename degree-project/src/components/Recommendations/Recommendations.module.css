@@ -1,10 +1,26 @@
-.searchResultsList {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2rem;
+.recommendationsContainer {
+  margin-top: 3rem;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 12px;
 }
 
-.searchResultItem {
+.title {
+  text-align: center;
+  font-size: clamp(1.6rem, calc(1.3rem + 2vw), 2.2rem);
+  font-weight: 700;
+  color: #343a40;
+  margin-top: 0;
+  margin-bottom: 2rem;
+}
+
+.recommendationsList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.recommendationItem {
   background-color: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
@@ -16,7 +32,7 @@
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-.searchResultItem:hover {
+.recommendationItem:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
@@ -29,12 +45,12 @@
 
 .recipeImage {
   width: 100%;
-  height: 250px;
+  height: 100%;
   object-fit: cover;
 }
 
 .itemContent {
-  padding: 1.2rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -42,7 +58,7 @@
 
 .itemContent h3 {
   margin: 0 0 0.5rem 0;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   flex-grow: 1;
 }
 
