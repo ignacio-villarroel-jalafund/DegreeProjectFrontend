@@ -31,7 +31,7 @@ export const useHomePageLogic = () => {
     }
 
     let query = "Recetas internacionales";
-    let title = "Recetas populares internacionalmente";
+    let title = "Recetas internacionales";
 
     if (locationError) {
       setActiveButton("popular");
@@ -41,7 +41,7 @@ export const useHomePageLogic = () => {
       case "local":
         if (locationInfo) {
           query = `Recetas de ${locationInfo.city}`;
-          title = `Recetas populares en ${locationInfo.city}`;
+          title = `Recetas de ${locationInfo.city}`;
         } else {
           setActiveButton("popular");
         }
@@ -50,7 +50,7 @@ export const useHomePageLogic = () => {
         if (locationInfo) {
           const countryDisplay = locationInfo.countryFullName || locationInfo.countryCode;
           query = `Recetas de ${countryDisplay}`;
-          title = `Recetas populares en ${countryDisplay}`;
+          title = `Recetas de ${countryDisplay}`;
         } else {
           setActiveButton("popular");
         }

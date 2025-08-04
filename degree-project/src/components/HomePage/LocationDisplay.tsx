@@ -53,7 +53,7 @@ const LocationDisplay: React.FC<LocationDisplayProps> = ({ locationHook }) => {
   };
 
   if (isLoadingLocation) {
-    return null; // Or a smaller loading indicator
+    return null;
   }
 
   if (locationError && !activeLocation) {
