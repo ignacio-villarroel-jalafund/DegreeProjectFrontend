@@ -1,9 +1,9 @@
-import { apiClient, RecipeRead } from "./api";
+import { apiClient, Recommendation } from "./api";
 
 export const getRecommendations = async (
   limit: number = 10
-): Promise<RecipeRead[]> => {
-  const response = await apiClient.get<RecipeRead[]>("/recommendations/", {
+): Promise<Recommendation[]> => {
+  const response = await apiClient.get<Recommendation[]>("/recommendations/", {
     params: { limit },
   });
   return response.data;

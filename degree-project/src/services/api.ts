@@ -90,6 +90,11 @@ export interface RecipeRead {
     updated_at?: string | null;
 }
 
+export interface Recommendation {
+  reason: string;
+  recipe: RecipeRead;
+}
+
 export interface AnalyzeTaskResponse {
   task_id: string;
 }
@@ -136,21 +141,6 @@ export interface Allergy {
   id: string;
   name: string;
   description: string | null;
-}
-
-export interface RecipeRead {
-    id: string;
-    recipe_name: string;
-    servings?: number | null;
-    ingredients: string;
-    directions: string;
-    rating?: number | null;
-    url: string;
-    cuisine_path?: string | null;
-    nutrition?: string | null;
-    img_src?: string | null;
-    created_at: string;
-    updated_at?: string | null;
 }
 
 export const getAllergiesAPI = async (): Promise<Allergy[]> => {

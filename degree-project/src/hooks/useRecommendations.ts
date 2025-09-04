@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getRecommendations } from '../services/recommendations';
-import { RecipeRead } from '../services/api';
+import { Recommendation } from '../services/api';
 import { useAuth } from './useAuth';
 
 export const useRecommendations = () => {
-  const [recommendations, setRecommendations] = useState<RecipeRead[]>([]);
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { isAuthenticated } = useAuth();

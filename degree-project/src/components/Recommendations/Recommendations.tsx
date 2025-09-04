@@ -1,11 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { RecipeRead } from "../../services/api";
+import { Recommendation } from "../../services/api";
 import LoadingSpinner from "../UI/LoadingSpinner";
 import styles from "./Recommendations.module.css";
 
 interface RecommendationsProps {
-  recipes: RecipeRead[] | null;
+  recipes: Recommendation[] | null;
   isLoading: boolean;
   error: string | null;
 }
@@ -39,20 +39,21 @@ const Recommendations: React.FC<RecommendationsProps> = ({
       <div className={styles.recommendationsList}>
         {recipes.map((result) => (
           <Link
-            key={result.url}
-            to={`/recipe/details?url=${encodeURIComponent(result.url)}`}
+            key={result.recipe.url}
+            to={`/recipe/details?url=${encodeURIComponent(result.recipe.url)}`}
             className={styles.recommendationItem}
           >
             <div className={styles.imageWrapper}>
               <img
-                src={result.img_src || "/icons/Burger_192.webp"}
-                alt={`Imagen de ${result.recipe_name}`}
+                src={result.recipe.img_src || "/icons/Burger_192.webp"}
+                alt={`Imagen de ${result.recipe.recipe_name}`}
                 className={styles.recipeImage}
                 loading="lazy"
               />
             </div>
             <div className={styles.itemContent}>
-              <h3>{result.recipe_name}</h3>
+              <h3>{result.recipe.recipe_name}</h3>
+              <p className={styles.reason}>{result.reason}</p>
               <span className={styles.detailsLink}>Ver Detalles →</span>
             </div>
           </Link>

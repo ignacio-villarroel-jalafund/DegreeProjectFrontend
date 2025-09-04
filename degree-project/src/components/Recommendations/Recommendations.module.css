@@ -1,5 +1,6 @@
 .recommendationsContainer {
-  margin-top: 3rem;
+  margin-top: -2rem;
+  margin-bottom: 2rem;
   padding: 1.5rem;
   background-color: #f8f9fa;
   border-radius: 12px;
@@ -62,11 +63,21 @@
   flex-grow: 1;
 }
 
+.reason {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 1rem;
+  font-style: italic;
+  flex-grow: 1;
+  text-align: center;
+}
+
 .detailsLink {
   color: #FF0000;
   font-weight: 600;
   text-decoration: none;
   align-self: flex-start;
+  margin-top: auto;
 }
 
 .infoText, .errorText {
