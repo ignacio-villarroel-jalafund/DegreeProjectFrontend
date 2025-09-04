@@ -90,7 +90,7 @@ const RecipeDisplayPage: React.FC = () => {
         <button onClick={handleGoBack} className={styles.backButton}>
           ← Volver
         </button>
-        <FavoriteButton recipe={recipe} isAdapted={isAdapted} />
+        <FavoriteButton recipe={recipe} isAdapted={isAdapted} isRecipeLoading={isLoading} />
       </div>
 
       <RecipeHeader recipe={recipe} />

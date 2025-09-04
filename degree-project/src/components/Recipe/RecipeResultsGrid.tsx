@@ -29,6 +29,7 @@ const RecipeResultsGrid: React.FC<RecipeResultsGridProps> = ({ recipes, isLoadin
         <Link
           key={result.url}
           to={`/recipe/details?url=${encodeURIComponent(result.url)}`}
+          state={{ recipe: result.recipe_data }}
           className={styles.searchResultItem}
         >
           <div className={styles.imageWrapper}>

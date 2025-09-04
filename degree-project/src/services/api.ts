@@ -41,6 +41,7 @@ export interface RecipeSearchResult {
   title: string;
   url: string;
   image_url: string;
+  recipe_data?: ScrapedRecipeData;
 }
 
 export interface HistoryRead {

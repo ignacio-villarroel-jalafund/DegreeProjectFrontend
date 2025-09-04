@@ -15,7 +15,7 @@ export const useRecipeDisplay = () => {
     isLoading: isLoadingRecipe,
     error: recipeError,
     updateRecipeData
-  } = useRecipe(recipeUrl);
+  } = useRecipe(recipeUrl, routerLocation.state?.recipe);
 
   const {
     adaptRecipe,

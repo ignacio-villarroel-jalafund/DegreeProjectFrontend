@@ -2,10 +2,19 @@ import { useState, useEffect, useCallback } from 'react';
 import { ScrapedRecipeData } from '../services/api';
 import { recipeService } from '../services/recipe.service';
 
-export const useRecipe = (recipeUrl: string | null) => {
-  const [recipe, setRecipe] = useState<ScrapedRecipeData | null>(null);
+const isRecipeDataComplete = (recipe: ScrapedRecipeData | null): boolean => {
+  if (!recipe) return false;
+  return !!(
+    recipe.title &&
+    recipe.ingredients && recipe.ingredients.length > 0 &&
+    recipe.directions && recipe.directions.length > 0
+  );
+};
+
+export const useRecipe = (recipeUrl: string | null, recipeFromState: ScrapedRecipeData | null) => {
+  const [recipe, setRecipe] = useState<ScrapedRecipeData | null>(recipeFromState || null);
   const [isAdapted, setIsAdapted] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(!isRecipeDataComplete(recipeFromState));
   const [error, setError] = useState<string | null>(null);
 
   const fetchRecipe = useCallback(async (url: string) => {
@@ -24,13 +33,10 @@ export const useRecipe = (recipeUrl: string | null) => {
   }, []);
 
   useEffect(() => {
-    if (recipeUrl) {
+    if ((!isRecipeDataComplete(recipeFromState) || !recipeFromState) && recipeUrl) {
       fetchRecipe(recipeUrl);
-    } else {
-      setError("No se proporcionó una URL de receta válida.");
-      setIsLoading(false);
     }
-  }, [recipeUrl, fetchRecipe]);
+  }, [recipeUrl, fetchRecipe, recipeFromState]);
 
   const updateRecipeData = useCallback((newRecipe: ScrapedRecipeData, adapted: boolean) => {
       setRecipe(newRecipe);
